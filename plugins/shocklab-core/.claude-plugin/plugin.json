@@ -1,0 +1,9 @@
+{
+  "name": "shocklab-core",
+  "version": "0.1.0",
+  "description": "Lab basics: lets Claude find and follow the ShockLab knowledge base",
+  "author": {
+    "name": "ShockLab-TestHub"
+  },
+  "repository": "https://github.com/ShockLab-TestHub/claude-agents"
+}

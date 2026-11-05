@@ -1,0 +1,19 @@
+{
+  "name": "shocklab",
+  "owner": {
+    "name": "ShockLab-TestHub"
+  },
+  "metadata": {
+    "description": "Claude Code agents, skills and commands for the ShockLab group",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "shocklab-core",
+      "source": "./plugins/shocklab-core",
+      "description": "Lab basics: lets Claude find and follow the ShockLab knowledge base",
+      "version": "0.1.0",
+      "category": "research"
+    }
+  ]
+}
