@@ -13,7 +13,10 @@ In Claude Code:
 ```
 /plugin marketplace add ShockLab-TestHub/claude-agents
 /plugin install shocklab-core@shocklab
+/plugin install shocklab-figures@shocklab
 ```
+
+(`shocklab-figures` is optional; see below.)
 
 Update later with `/plugin marketplace update shocklab`.
 
@@ -22,6 +25,7 @@ Update later with `/plugin marketplace update shocklab`.
 | Plugin | What it gives you |
 |---|---|
 | `shocklab-core` | **Everyone should install this.** A start-of-session reminder plus the `lab-knowledge` skill: Claude checks the [knowledge base](https://github.com/ShockLab-TestHub/knowledge) before working out anything org-specific (M3, Slurm, Strudel, Market, rigs), and offers to record what it learns so the next person doesn't have to |
+| `shocklab-figures` | The `figure-master` agent: makes plots from data in the lab's MATLAB house style (Times 16 pt, LaTeX labels, `pogmap`/`CMRmap`, no titles), restyles existing ones, copies journal figures only after checking their licence and recreates them from data otherwise, then hands back a LaTeX figure block. Ships the `pogmap` and `CMRmap` colormaps. See [Setting up figure-master](#setting-up-figure-master) |
 
 ### How `shocklab-core` avoids duplicated work
 
@@ -51,8 +55,30 @@ ShockLab-TestHub/knowledge (local clone, or `gh api`). After solving something
 non-obvious and org-specific, offer to record it there once my task is done.
 ```
 
-Planned: `figure-master` (publication figures from MATLAB) and `video-master`
-(schlieren/field videos), once generalised.
+### Setting up figure-master
+
+You need MATLAB. To pull figures out of papers you also need `pdfimages` and `pdftoppm`
+(from MiKTeX, TeX Live or Poppler). The agent reads your paths from a `## Figures` section
+in your project's `CLAUDE.md`. If that section is missing, it asks you for the paths and
+then gives you the section to paste in:
+
+```markdown
+## Figures
+- Document: C:\path\to\Report\main.tex
+- Figures folder: C:\path\to\Report\figures
+- Scripts folder: C:\path\to\Report\figures\scripts
+- Bibliography: C:\path\to\Report\reference.bib
+- Paper PDFs: C:\path\to\papers            (optional)
+- Git: Overleaf clone, never commit         (optional)
+```
+
+The first time it's used, it copies `pogmap` and `CMRmap` into `<scripts folder>/colormaps/`,
+so your scripts still run for co-authors who don't have the plugin. To use it, just ask for
+a figure ("make a figure of ... from ..."). Claude hands the job to `figure-master`, or you
+can ask for it by name.
+
+Planned: `video-master` (schlieren and field videos from FieldsPlayer), once FieldsPlayer
+has a home in the org.
 
 ## Layout
 

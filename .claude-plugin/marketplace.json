@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Claude Code agents, skills and commands for the ShockLab group",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "plugins": [
     {
@@ -13,6 +13,13 @@
       "source": "./plugins/shocklab-core",
       "description": "Check the ShockLab knowledge base before working out org-specific procedures, and record new findings",
       "version": "0.2.0",
+      "category": "research"
+    },
+    {
+      "name": "shocklab-figures",
+      "source": "./plugins/shocklab-figures",
+      "description": "figure-master agent: makes, restyles, copies and recreates figures for LaTeX reports, theses and papers in ShockLab's MATLAB plotting style",
+      "version": "0.1.0",
       "category": "research"
     }
   ]
