@@ -11,8 +11,8 @@
     {
       "name": "shocklab-core",
       "source": "./plugins/shocklab-core",
-      "description": "Lab basics: lets Claude find and follow the ShockLab knowledge base",
-      "version": "0.1.0",
+      "description": "Check the ShockLab knowledge base before working out org-specific procedures, and record new findings",
+      "version": "0.2.0",
       "category": "research"
     }
   ]

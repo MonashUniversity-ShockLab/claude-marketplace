@@ -1,7 +1,7 @@
 {
   "name": "shocklab-core",
-  "version": "0.1.0",
-  "description": "Lab basics: lets Claude find and follow the ShockLab knowledge base",
+  "version": "0.2.0",
+  "description": "Check the ShockLab knowledge base before working out org-specific procedures, and record new findings",
   "author": {
     "name": "ShockLab-TestHub"
   },

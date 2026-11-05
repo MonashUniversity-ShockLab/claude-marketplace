@@ -1,0 +1,16 @@
+{
+  "description": "Remind Claude to check the ShockLab knowledge base before working out org-specific procedures, and to record new findings",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat \"${CLAUDE_PLUGIN_ROOT}/hooks/session-reminder.md\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
