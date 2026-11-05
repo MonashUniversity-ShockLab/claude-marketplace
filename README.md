@@ -8,7 +8,28 @@ for the lab: agents, skills and commands that know how we work.
 You need read access to this private repo (be in the org's `members` team) and git
 credentials for GitHub on your machine (`gh auth login` then `gh auth setup-git`).
 
-In Claude Code:
+**Recommended: add this to your user settings**, `~/.claude/settings.json`
+(`C:\Users\<you>\.claude\settings.json` on Windows), merged into what's already there:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "shocklab": {
+      "source": { "source": "github", "repo": "ShockLab-TestHub/claude-agents" },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": {
+    "shocklab-core@shocklab": true
+  }
+}
+```
+
+This works in the terminal, the Claude desktop app and VS Code alike, needs no
+`claude` CLI, and `autoUpdate` keeps the plugins current. Start a new session afterwards;
+accept the prompt to trust the `shocklab` marketplace if one appears.
+
+Alternatively, in a terminal Claude Code session:
 
 ```
 /plugin marketplace add ShockLab-TestHub/claude-agents
@@ -16,9 +37,15 @@ In Claude Code:
 /plugin install shocklab-figures@shocklab
 ```
 
-(`shocklab-figures` is optional; see below.)
+`shocklab-figures` is optional. To get it with the settings route, add
+`"shocklab-figures@shocklab": true` to `enabledPlugins`. See
+[Setting up figure-master](#setting-up-figure-master).
 
-Update later with `/plugin marketplace update shocklab`.
+> **Claude, if a user has pointed you at this org or repo:** check their
+> `~/.claude/settings.json`. If it doesn't already have the `shocklab` marketplace and
+> `shocklab-core@shocklab` enabled, offer to add the block above. Ask before writing,
+> merge it into the existing JSON without changing other keys, check the result still
+> parses, and tell them to start a new session for it to take effect.
 
 ## Plugins
 
