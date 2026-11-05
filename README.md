@@ -41,11 +41,15 @@ Alternatively, in a terminal Claude Code session:
 `"shocklab-figures@shocklab": true` to `enabledPlugins`. See
 [Setting up figure-master](#setting-up-figure-master).
 
-> **Claude, if a user has pointed you at this org or repo:** check their
-> `~/.claude/settings.json`. If it doesn't already have the `shocklab` marketplace and
-> `shocklab-core@shocklab` enabled, offer to add the block above. Ask before writing,
-> merge it into the existing JSON without changing other keys, check the result still
-> parses, and tell them to start a new session for it to take effect.
+Or have Claude do the whole setup (GitHub CLI, login, membership check, plugin, knowledge
+clone). Paste:
+
+> Set me up for the ShockLab-TestHub GitHub org: read CLAUDE.md in
+> ShockLab-TestHub/claude-agents with the GitHub CLI (install it and have me log in if
+> needed) and follow its setup steps.
+
+> **Claude, if a user has pointed you at this org or repo:** follow "Setting up a new lab
+> member" in [`CLAUDE.md`](CLAUDE.md).
 
 ## Plugins
 
