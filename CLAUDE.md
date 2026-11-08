@@ -104,6 +104,12 @@ in the same way:
 
 On Windows, use forward slashes or escaped backslashes in the JSON string.
 
+Ask whether they already have paper PDFs (e.g. a personal Obsidian vault). If so, offer to
+copy them into `<parent>/knowledge/attachments/papers/`, which git ignores. Paper notes
+embed PDFs from there, and the files need the `author-year-shorttitle.pdf` names in the
+notes' `pdf:` fields. Papers they don't have show a "not found" placeholder, which is
+expected.
+
 Optional: suggest opening the clone as an Obsidian vault with the Dataview plugin.
 
 ### 7. Finish
