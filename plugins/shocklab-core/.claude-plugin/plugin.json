@@ -1,6 +1,6 @@
 {
   "name": "shocklab-core",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Check the ShockLab knowledge base before working out org-specific procedures, and record new findings",
   "author": {
     "name": "ShockLab-TestHub"

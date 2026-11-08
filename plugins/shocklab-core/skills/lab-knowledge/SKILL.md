@@ -40,6 +40,13 @@ Keep this quick — a few seconds, not a research project:
    `type: generated` and an empty `verified:` as unverified, and say so.
 4. If nothing covers it, say that briefly and carry on with the task.
 
+**Paper PDFs.** Each member keeps their own PDFs in `attachments/papers/` in their clone
+(git ignores it). A paper note's `pdf:` field and its `![[...]]` embed point there. If the
+user asks about a paper and its PDF is present, you can read it. If it's missing, that's
+normal: work from the note, tell the user the PDF isn't in their library, and give them
+the `doi:`/`url:` so they can save it under the `pdf:` filename. Never remove or change an
+embed because the file is missing.
+
 ## 3. Write back what you learn
 
 When a task turns up something **non-obvious and specific to the org** — a Slurm flag M3
