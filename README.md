@@ -72,7 +72,7 @@ clone). Paste:
 | Plugin | What it gives you |
 |---|---|
 | `shocklab-core` | **Everyone should install this.** A start-of-session reminder plus the `lab-knowledge` skill: Claude checks the [knowledge base](https://github.com/MonashUniversity-ShockLab/Library_of_Shock_Lab) before working out anything org-specific (M3, Slurm, Strudel, Market, rigs) and points literature questions at `/lit`, and offers to record what it learns so the next person doesn't have to |
-| `shocklab-library` | Skills for the shared paper library (`Library_of_Shock_Lab`, found through `SHOCKLAB_KNOWLEDGE`): for everyone, `/lit` (answer from the library, with note and page citations) and `/research-question` (in-depth reasoned answer, saved to your own `research_questions/`); for maintainers only, `/add-paper` (index new PDFs into notes, topic pages and data tables, then file them on Market), `/paper-audit` and `/restructure-note` (bring older notes up to standard), plus the `paper-auditor` and `note-restructurer` agents they launch. Students request a paper by putting its PDF in Market `Z:\Library_of_Shock_Lab\papers\_Unprocessed\`; maintainers process it and push. See [Setting up the paper library](#setting-up-the-paper-library) |
+| `shocklab-library` | Skills for the shared paper library (`Library_of_Shock_Lab`, found through `SHOCKLAB_KNOWLEDGE`): for everyone, `/lit` (answer from the library, with note and page citations) and `/research-question` (in-depth reasoned answer, saved to `research_questions/` in your personal folder); for maintainers only, `/add-paper` (index new PDFs into notes, topic pages and data tables, then file them on Market), `/paper-audit` and `/restructure-note` (bring older notes up to standard), plus the `paper-auditor` and `note-restructurer` agents they launch. Students request a paper by putting its PDF in Market `Z:\Library_of_Shock_Lab\papers\_Unprocessed\`; maintainers process it and push. See [Setting up the paper library](#setting-up-the-paper-library) |
 | `shocklab-apps` | `/queue` (add a request to an app's `FEATURE_QUEUE.md` for the next build) and `/enact-queue` (build every queued request with one version bump, using the build and test steps in the app's README). Works for any app folder in your repo that has, or gets, a `FEATURE_QUEUE.md` |
 | `shocklab-figures` | The `figure-master` agent: makes plots from data in the lab's MATLAB house style (Times 16 pt, LaTeX labels, `pogmap`/`CMRmap`, no titles), restyles existing ones, copies journal figures only after checking their licence and recreates them from data otherwise, then hands back a LaTeX figure block. Ships the `pogmap` and `CMRmap` colormaps. See [Setting up figure-master](#setting-up-figure-master) |
 
@@ -117,8 +117,11 @@ non-obvious and org-specific, offer to record it there once my task is done.
    `pdfinfo` (Poppler, MiKTeX or TeX Live) are needed by `/add-paper` and `/paper-audit` (maintainers).
 
 `Misc/` (ledgers such as `paper_audit.tsv`, `restructure_ledger.tsv`, `Papers_to_get.md`)
-and `research_questions/` in your clone are personal: the skills create what they need
-there, and nothing in them is committed to the shared repo.
+and `research_questions/` are personal and live in a folder outside the clone: the path in
+`SHOCKLAB_PERSONAL` if set, else `My_Knowledgebase/` next to the clone (`../My_Knowledgebase`)
+if it exists, else the clone itself (where both are git-ignored). The skills and
+`tools/library.py` find it the same way and create what they need there; nothing in it is
+committed to the shared repo.
 
 ### Using a skill without the plugin
 

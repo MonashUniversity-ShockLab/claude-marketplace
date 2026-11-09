@@ -46,7 +46,7 @@ If no topic page fits, say so and fall back to `find` plus Grep over `<library>/
 - Lead with the answer. Back each claim with a citation in the form [Author Year](<library>/paper_notes/<key>.md), p. N.
 - Cover modelling and simulation (linear stability, resolvent, reduced-order models, LES/DNS) as fully as experiment. Keep the two apart where they disagree, and say how well the models match the data.
 - State disagreements and open questions plainly, and say which view the stronger evidence supports.
-- Say what the library does **not** cover. You may add papers you know of from outside it, but label them "not in the library" and, if they look worth having, suggest adding them with `/add-paper` (or list them in the user's own `<library>/Misc/Papers_to_get.md`, a personal file that is not committed to the shared repo).
+- Say what the library does **not** cover. You may add papers you know of from outside it, but label them "not in the library" and, if they look worth having, suggest adding them with `/add-paper` (or list them in the user's own `<personal>/Misc/Papers_to_get.md`, a personal file that is not committed to the shared repo; `<personal>` is the folder in `SHOCKLAB_PERSONAL` if set, else `<library>/../My_Knowledgebase` if it exists, else `<library>`).
 - Never present your own background knowledge as coming from a note. Flag details the notes mark as unverified or figure-read.
 - For the user's own data or results, relate them to the published values (data tables, topic pages), and say what is new or at odds. Use the user's own `CLAUDE.md` for what their research and projects are.
 

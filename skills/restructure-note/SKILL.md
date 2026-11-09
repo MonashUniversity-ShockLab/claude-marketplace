@@ -27,7 +27,7 @@ The helper scripts need only standard Python 3: run them as `python <library>/to
 
 **Pull first.** Pull (`git -C <library> pull --ff-only`) and commit on the current branch (normally `main`); the run ends with a push (section 3). If the maintainer prefers a pull request, create a branch now (e.g. `restructure/YYYY-MM-DD`) for every commit below. A maintainer working in their own repo for the weekly sync just commits there.
 
-**Personal files.** The ledger `<library>/Misc/restructure_ledger.tsv`, the flags file `<library>/Misc/restructure_flags.md`, and the audit ledger and `notes_to_update.md` it reads, are the user's own working files: not part of the shared repo and never committed to it. Create the ledger and flags file when missing (headers below).
+**Personal files.** `<personal>` is the user's personal folder for these files, outside the shared repo: the path in the environment variable `SHOCKLAB_PERSONAL` if it is set, else `My_Knowledgebase/` next to the library (`<library>/../My_Knowledgebase`) if it exists, else `<library>` itself (the old layout, where `Misc/` and `research_questions/` are git-ignored). The library tools find it the same way (`library.personal_dir()` in `<library>/tools/library.py`). The ledger `<personal>/Misc/restructure_ledger.tsv`, the flags file `<personal>/Misc/restructure_flags.md`, and the audit ledger and `notes_to_update.md` it reads, are the user's own working files: not part of the shared repo and never committed to it. Create the ledger and flags file when missing (headers below).
 
 ## Settings
 
@@ -40,8 +40,8 @@ The helper scripts need only standard Python 3: run them as `python <library>/to
 | Wave size | 3 restructurers in parallel; check, move and commit each wave before the next | A long note costs about the same with a larger or smaller model (the cost is mostly reading and rewriting the note), so batches are worth running when usage is otherwise idle |
 | Restructurer | `note-restructurer` subagent (shipped with this skill's plugin as `shocklab-library:note-restructurer`; Sonnet, only Read/Write/Edit/Bash, the template inline), `effort: "medium"` | It edits text it is given; the hard reading was done by the audit, and `compare` guards against losses |
 | Drafts | `<library>/paper_notes/_restructure/<key>.md` (git-ignored) | The live note is untouched until the check passes |
-| Ledger | `<library>/Misc/restructure_ledger.tsv` (personal, not committed) | Lets runs resume and report progress |
-| Flags | `<library>/Misc/restructure_flags.md` (personal, not committed) | Possible errors seen while editing, for the next audit or the user; never fixed here |
+| Ledger | `<personal>/Misc/restructure_ledger.tsv` (personal, not committed) | Lets runs resume and report progress |
+| Flags | `<personal>/Misc/restructure_flags.md` (personal, not committed) | Possible errors seen while editing, for the next audit or the user; never fixed here |
 
 ## 0. Mode
 
@@ -55,7 +55,7 @@ From `$ARGUMENTS`:
 ## 1. Gates
 
 1. **Leftover drafts.** For each `_restructure/<key>.md` from a cut-off run: if its `<key>.result.md` exists, check and fold it (section 3); otherwise delete the draft and put the note first in this run's batch (a restructure is cheap to redo, unlike an audit).
-2. **Skip** any note that is in `paper_notes/_audit/` or `paper_notes/_incoming/` (an audit or add-paper run is working on it), has uncommitted changes (`git status --short -- <note>`), or is named in `Misc/notes_to_update.md` with items still open (the restructure would compete with that edit; let `/paper-audit`'s section 4 apply them first). Say which were skipped.
+2. **Skip** any note that is in `paper_notes/_audit/` or `paper_notes/_incoming/` (an audit or add-paper run is working on it), has uncommitted changes (`git status --short -- <note>`), or is named in `<personal>/Misc/notes_to_update.md` with items still open (the restructure would compete with that edit; let `/paper-audit`'s section 4 apply them first). Say which were skipped.
 3. Never touch PDFs, topic pages, data tables, `notes_to_update.md`, `notes_to_check.md` or the audit ledger. This lets this skill run beside `/paper-audit` and `/add-paper` without their files colliding.
 
 ## 2. Launch restructurers
@@ -73,8 +73,8 @@ For each note:
 2. The page-ref occurrence count may fall only where repetition was cut. If it fell by more than about a third, or the note shrank by more than 45%, read `git diff --no-index --word-diff=color` around a few cuts before accepting.
 3. If the live note's `git hash-object` changed since launch, discard the draft and leave the note for the next run.
 4. `mv -f <library>/paper_notes/_restructure/<key>.md <library>/paper_notes/<key>.md`.
-5. Append the result file's possible errors to `Misc/restructure_flags.md` under `## <key> (YYYY-MM-DD)` (skip if that heading exists). Create the file with a one-line header if missing: "Possible errors noticed while restructuring notes (not checked against the PDF). Fold into notes_to_check.md or the next audit."
-6. Append a ledger row to `Misc/restructure_ledger.tsv`, creating it with this header if missing: `key	restructured	words_before	words_after	pages	target	still_over	moved_to_own_analysis	note` (tab-separated; `still_over` yes/no; `note` one short line, e.g. the reason it is over target).
+5. Append the result file's possible errors to `<personal>/Misc/restructure_flags.md` under `## <key> (YYYY-MM-DD)` (skip if that heading exists). Create the file with a one-line header if missing: "Possible errors noticed while restructuring notes (not checked against the PDF). Fold into notes_to_check.md or the next audit."
+6. Append a ledger row to `<personal>/Misc/restructure_ledger.tsv`, creating it with this header if missing: `key	restructured	words_before	words_after	pages	target	still_over	moved_to_own_analysis	note` (tab-separated; `still_over` yes/no; `note` one short line, e.g. the reason it is over target).
 7. Delete `<key>.result.md`.
 
 Then `library.py check` (it must show no new ERROR or WARN for these notes), and commit the wave's notes by name, on the current branch (the ledger and flags file are personal and stay uncommitted): `git commit -m "Restructure reference notes: <n> notes (structure and length rules, no content change)" -- <paths>`. The notes' frontmatter is unchanged, so `INDEX.md` and `references.bib` need no rebuild.
