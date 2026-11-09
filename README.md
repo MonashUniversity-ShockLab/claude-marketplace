@@ -111,9 +111,42 @@ can ask for it by name.
 Planned: `video-master` (schlieren and field videos from FieldsPlayer), once FieldsPlayer
 has a home in the org.
 
+## PR agent
+
+Every repo in the org can have Claude review its pull requests. On each PR (not drafts)
+it:
+
+1. reviews the change against that repo's `CLAUDE.md`;
+2. commits fixes for mechanical problems (frontmatter, naming, version bumps) to the PR
+   branch;
+3. labels the PR either `claude-approved`, in which case the workflow squash-merges it,
+   or `needs-human`, with a comment saying who should look and why.
+
+It never auto-merges a PR that touches `.github/`. Members with write access can also
+write `@claude ...` in a PR or issue comment to ask it for something.
+
+The agent is [`.github/workflows/pr-agent.yml`](.github/workflows/pr-agent.yml). Each
+repo turns it on with a short `.github/workflows/claude.yml`. Copy
+[`templates/claude-caller.yml`](templates/claude-caller.yml) and add any repo-specific
+rules in `repo_rules`.
+
+**To add a repo** (needs an org admin):
+
+1. Copy the caller workflow in and merge it.
+2. Add the API key as a repo secret. Org secrets don't reach private repos on GitHub
+   Free. The command prompts for the key, so it never lands in your shell history:
+   `gh secret set ANTHROPIC_API_KEY --repo ShockLab-TestHub/<repo>`
+3. Make sure the [Claude GitHub App](https://github.com/apps/claude) is installed for
+   that repo. Installing it on "All repositories" covers new repos automatically.
+
+The key comes from the lab's Anthropic Console workspace. Usage is billed there, so keep
+a monthly spend limit on it.
+
 ## Layout
 
 ```
+.github/workflows/pr-agent.yml           the org-wide PR agent (reusable workflow)
+templates/claude-caller.yml              per-repo workflow that turns the agent on
 .claude-plugin/marketplace.json          the catalogue: one entry per plugin
 plugins/<plugin>/.claude-plugin/plugin.json
 plugins/<plugin>/agents/<agent>.md       subagents
