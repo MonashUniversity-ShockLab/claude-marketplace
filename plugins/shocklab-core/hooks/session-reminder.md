@@ -1,3 +1,3 @@
-ShockLab (shocklab-core plugin): this user is in the ShockLab group, which keeps a shared knowledge base (ShockLab-TestHub/knowledge) so nobody works out the same org-specific thing twice.
+ShockLab (shocklab-core plugin): this user is in the ShockLab group, which keeps a shared knowledge base (MonashUniversity-ShockLab/knowledge) so nobody works out the same org-specific thing twice.
 - Before working out anything specific to the lab, Monash or its infrastructure (M3/MASSIVE, Slurm requests, Strudel, the Market drive, MATLAB on the cluster, lab rigs, cameras, schlieren/PIV/calibration, SPOD), use the lab-knowledge skill to check the knowledge base first. Keep the check quick.
 - After solving something non-obvious and org-specific, offer to record it in the knowledge base once the user's task is done (lab-knowledge skill, section 3).

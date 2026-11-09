@@ -1,0 +1,8 @@
+# Sandbox for the ShockLab PR agent. Network is deny-by-default: only GitHub.
+# codeload.github.com serves repo tarballs (GitHub redirects there; no token sent).
+name: shocklab-pr-agent
+config:
+  type: cloud
+  networking:
+    type: limited
+    allowed_hosts: [api.github.com, github.com, codeload.github.com]

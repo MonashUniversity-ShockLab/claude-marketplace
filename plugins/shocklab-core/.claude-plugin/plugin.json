@@ -1,9 +1,9 @@
 {
   "name": "shocklab-core",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Check the ShockLab knowledge base before working out org-specific procedures, and record new findings",
   "author": {
-    "name": "ShockLab-TestHub"
+    "name": "MonashUniversity-ShockLab"
   },
-  "repository": "https://github.com/ShockLab-TestHub/claude-agents"
+  "repository": "https://github.com/MonashUniversity-ShockLab/claude-marketplace"
 }

@@ -5,7 +5,7 @@ description: Check the ShockLab knowledge base BEFORE working out anything speci
 
 # ShockLab knowledge base
 
-The lab's shared knowledge lives in the private repo `ShockLab-TestHub/knowledge`, an
+The lab's shared knowledge lives in the private repo `MonashUniversity-ShockLab/knowledge`, an
 Obsidian vault of Markdown notes. Its `CLAUDE.md` is the authority on layout, naming and
 provenance rules — read it before writing anything, and follow it over anything here.
 
@@ -20,10 +20,10 @@ Check in this order and use the first that exists:
 2. A sibling or parent folder named `knowledge` that contains a `CLAUDE.md` whose first line
    is `# knowledge: conventions`.
 3. Otherwise, read without cloning:
-   `gh api repos/ShockLab-TestHub/knowledge/contents/<path> -H "Accept: application/vnd.github.raw"`
-   and search with `gh search code --repo ShockLab-TestHub/knowledge "<term>"`.
+   `gh api repos/MonashUniversity-ShockLab/knowledge/contents/<path> -H "Accept: application/vnd.github.raw"`
+   and search with `gh search code --repo MonashUniversity-ShockLab/knowledge "<term>"`.
    If the user wants to write to it, offer to clone it
-   (`gh repo clone ShockLab-TestHub/knowledge`) and suggest they set `SHOCKLAB_KNOWLEDGE`.
+   (`gh repo clone MonashUniversity-ShockLab/knowledge`) and suggest they set `SHOCKLAB_KNOWLEDGE`.
 
 With a clone, run `git pull --ff-only` first (skip quietly if it fails, e.g. offline).
 

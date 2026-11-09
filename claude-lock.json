@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "origin": {
+    "base_url": "https://api.anthropic.com",
+    "organization_id": "d3d26d8c-53e1-44ca-81e2-ad91f287add4",
+    "workspace_id": "wrkspc_018fnESjDPP7enSCUYpsKemM"
+  },
+  "resources": {
+    "./managed-agents/pr-agent/agent.md": {
+      "kind": "agent",
+      "id": "agent_01LmfY5vkfC5KZX1xKWGMjYd",
+      "version": "2",
+      "hash": "aa066cf7590d08e200bb9b562d791fab",
+      "remote_hash": "1b44e617a5c08cf923397e98f1657216",
+      "stamp": "2"
+    },
+    "./managed-agents/pr-agent/deployment-hourly.yaml": {
+      "kind": "deployment",
+      "id": "depl_01EbZV1SohiPntjBKyL6QMK6",
+      "hash": "e4d22b3d9d7786cf116c148c1d5f884d",
+      "remote_hash": "e4d22b3d9d7786cf116c148c1d5f884d",
+      "stamp": "2026-11-09T05:42:49.916980Z"
+    },
+    "./managed-agents/pr-agent/environment.yaml": {
+      "kind": "environment",
+      "id": "env_01QeEF3vcECoRSgEGPVJbXS7",
+      "hash": "4a098744a20c43df7183c1c356cc7bca",
+      "remote_hash": "c8a87f2db1542add9d2c65eb4a00e75c",
+      "stamp": "2026-11-09T04:47:23.494866Z"
+    },
+    "./managed-agents/pr-agent/vault.yaml": {
+      "kind": "vault",
+      "id": "vlt_011CgrkLxBgcaaor8AgM82Q1",
+      "hash": "980fc79928637c6de1872fdd2f3ba9d7",
+      "remote_hash": "980fc79928637c6de1872fdd2f3ba9d7",
+      "stamp": "2026-11-09T04:47:23.826599Z"
+    }
+  }
+}
