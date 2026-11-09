@@ -1,11 +1,11 @@
-# claude-agents
+# claude-marketplace
 
 The ShockLab Claude Code plugin marketplace (`shocklab`). See `README.md` for layout and
 how to add a plugin.
 
 ## Setting up a new lab member
 
-Run this when a user asks to be set up for ShockLab-TestHub, or when you notice their
+Run this when a user asks to be set up for MonashUniversity-ShockLab, or when you notice their
 setup is incomplete. Go in order. Each step checks first and skips if already done, so it
 is safe to re-run. Ask before anything that writes to their machine or config. At the
 end, summarise what you did and what they still need to do.
@@ -39,16 +39,16 @@ it fails without a clear error.
 
 ### 4. Member of the org
 
-`gh api user/memberships/orgs/ShockLab-TestHub --jq .state`
+`gh api user/memberships/orgs/MonashUniversity-ShockLab --jq .state`
 
 - `active`: continue.
 - `pending`: they haven't accepted the invite. Send them to
-  https://github.com/orgs/ShockLab-TestHub/invitation, then re-check.
+  https://github.com/orgs/MonashUniversity-ShockLab/invitation, then re-check.
 - 404 or error: they haven't been invited. **Stop here.** Tell them to ask an org owner to
   add their GitHub username (`gh api user --jq .login`) to the `members` team.
 
 Then confirm git can read the repos without prompting:
-`GIT_TERMINAL_PROMPT=0 git ls-remote https://github.com/ShockLab-TestHub/claude-agents.git HEAD`
+`GIT_TERMINAL_PROMPT=0 git ls-remote https://github.com/MonashUniversity-ShockLab/claude-marketplace.git HEAD`
 (in PowerShell, set `$env:GIT_TERMINAL_PROMPT=0` first).
 
 ### 5. Marketplace and plugin in user settings
@@ -61,7 +61,7 @@ missing, add:
 {
   "extraKnownMarketplaces": {
     "shocklab": {
-      "source": { "source": "github", "repo": "ShockLab-TestHub/claude-agents" },
+      "source": { "source": "github", "repo": "MonashUniversity-ShockLab/claude-marketplace" },
       "autoUpdate": true
     }
   },
@@ -90,7 +90,7 @@ Dropbox, because sync tools can corrupt `.git` (e.g. `C:\Users\<you>\code` or `~
 Then:
 
 ```
-git -c core.longpaths=true clone https://github.com/ShockLab-TestHub/knowledge.git <parent>/knowledge
+git -c core.longpaths=true clone https://github.com/MonashUniversity-ShockLab/knowledge.git <parent>/knowledge
 ```
 
 On Windows, also run `git -C <parent>/knowledge config core.longpaths true`.

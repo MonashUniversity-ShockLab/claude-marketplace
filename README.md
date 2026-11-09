@@ -15,7 +15,7 @@ credentials for GitHub on your machine (`gh auth login` then `gh auth setup-git`
 {
   "extraKnownMarketplaces": {
     "shocklab": {
-      "source": { "source": "github", "repo": "ShockLab-TestHub/claude-agents" },
+      "source": { "source": "github", "repo": "MonashUniversity-ShockLab/claude-marketplace" },
       "autoUpdate": true
     }
   },
@@ -32,7 +32,7 @@ accept the prompt to trust the `shocklab` marketplace if one appears.
 Alternatively, in a terminal Claude Code session:
 
 ```
-/plugin marketplace add ShockLab-TestHub/claude-agents
+/plugin marketplace add MonashUniversity-ShockLab/claude-marketplace
 /plugin install shocklab-core@shocklab
 /plugin install shocklab-figures@shocklab
 ```
@@ -44,8 +44,8 @@ Alternatively, in a terminal Claude Code session:
 Or have Claude do the whole setup (GitHub CLI, login, membership check, plugin, knowledge
 clone). Paste:
 
-> Set me up for the ShockLab-TestHub GitHub org: read CLAUDE.md in
-> ShockLab-TestHub/claude-agents with the GitHub CLI (install it and have me log in if
+> Set me up for the MonashUniversity-ShockLab GitHub org: read CLAUDE.md in
+> MonashUniversity-ShockLab/claude-marketplace with the GitHub CLI (install it and have me log in if
 > needed) and follow its setup steps.
 
 > **Claude, if a user has pointed you at this org or repo:** follow "Setting up a new lab
@@ -55,7 +55,7 @@ clone). Paste:
 
 | Plugin | What it gives you |
 |---|---|
-| `shocklab-core` | **Everyone should install this.** A start-of-session reminder plus the `lab-knowledge` skill: Claude checks the [knowledge base](https://github.com/ShockLab-TestHub/knowledge) before working out anything org-specific (M3, Slurm, Strudel, Market, rigs), and offers to record what it learns so the next person doesn't have to |
+| `shocklab-core` | **Everyone should install this.** A start-of-session reminder plus the `lab-knowledge` skill: Claude checks the [knowledge base](https://github.com/MonashUniversity-ShockLab/knowledge) before working out anything org-specific (M3, Slurm, Strudel, Market, rigs), and offers to record what it learns so the next person doesn't have to |
 | `shocklab-figures` | The `figure-master` agent: makes plots from data in the lab's MATLAB house style (Times 16 pt, LaTeX labels, `pogmap`/`CMRmap`, no titles), restyles existing ones, copies journal figures only after checking their licence and recreates them from data otherwise, then hands back a LaTeX figure block. Ships the `pogmap` and `CMRmap` colormaps. See [Setting up figure-master](#setting-up-figure-master) |
 
 ### How `shocklab-core` avoids duplicated work
@@ -82,7 +82,7 @@ If you'd rather not install the hook, put this in your user-level `~/.claude/CLA
 Before working out anything specific to the lab, Monash or its infrastructure (M3/MASSIVE,
 Slurm requests, Strudel, the Market drive, MATLAB on the cluster, lab rigs, cameras),
 check the ShockLab knowledge base first: start at `documentation/Org Gotchas.md` in
-ShockLab-TestHub/knowledge (local clone, or `gh api`). After solving something
+MonashUniversity-ShockLab/knowledge (local clone, or `gh api`). After solving something
 non-obvious and org-specific, offer to record it there once my task is done.
 ```
 

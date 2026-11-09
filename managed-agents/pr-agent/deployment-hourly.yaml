@@ -11,4 +11,4 @@ initial_events:
     content:
       - type: text
         text: |
-          Run your sweep of open pull requests in the ShockLab-TestHub org now.
+          Run your sweep of open pull requests in the MonashUniversity-ShockLab org now.
