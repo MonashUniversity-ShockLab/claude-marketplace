@@ -113,40 +113,45 @@ has a home in the org.
 
 ## PR agent
 
-Every repo in the org can have Claude review its pull requests. On each PR (not drafts)
-it:
+A Claude agent in the lab's Anthropic Console (a Managed Agent) looks after pull requests
+across the whole org. Every hour, 8am to 8pm Melbourne time, Monday to Friday, it:
 
-1. reviews the change against that repo's `CLAUDE.md`;
-2. commits fixes for mechanical problems (frontmatter, naming, version bumps) to the PR
+1. finds open, non-draft PRs it hasn't reviewed at their current commit;
+2. reviews each one against that repo's `CLAUDE.md`;
+3. commits fixes for mechanical problems (frontmatter, naming, version bumps) to the PR
    branch;
-3. labels the PR either `claude-approved`, in which case the workflow squash-merges it,
-   or `needs-human`, with a comment saying who should look and why.
+4. squash-merges it and labels it `claude-approved`, or labels it `needs-human` with a
+   comment saying who should look and why.
 
-It never auto-merges a PR that touches `.github/`. Members with write access can also
-write `@claude ...` in a PR or issue comment to ask it for something.
+New repos are covered automatically. Nothing needs adding per repo. Its GitHub token has
+no Workflows permission, so it can't change `.github/workflows/`. Pushes straight to
+`main` skip it.
 
-The agent is [`.github/workflows/pr-agent.yml`](.github/workflows/pr-agent.yml). Each
-repo turns it on with a short `.github/workflows/claude.yml`. Copy
-[`templates/claude-caller.yml`](templates/claude-caller.yml) and add any repo-specific
-rules in `repo_rules`.
+Its definition lives in [`managed-agents/pr-agent/`](managed-agents/pr-agent/):
 
-**To add a repo** (needs an org admin):
+| File | What it is |
+|---|---|
+| `agent.md` | Model and instructions (the review, fix and merge rules) |
+| `environment.yaml` | Sandbox; its network can only reach GitHub |
+| `vault.yaml` | Holds the GitHub token as `GH_TOKEN` (the token itself is added separately and never committed) |
+| `deployment-hourly.yaml` | The schedule, plus a $3 cap per run |
 
-1. Copy the caller workflow in and merge it.
-2. Add the API key as a repo secret. Org secrets don't reach private repos on GitHub
-   Free. The command prompts for the key, so it never lands in your shell history:
-   `gh secret set ANTHROPIC_API_KEY --repo ShockLab-TestHub/<repo>`
-3. Make sure the [Claude GitHub App](https://github.com/apps/claude) is installed for
-   that repo. Installing it on "All repositories" covers new repos automatically.
+`claude-lock.json` records the Console IDs. To change the agent, edit the file, then run
+`ant apply managed-agents/pr-agent/<file>` from the repo root, signed in with
+`ant auth login` to the ShockLab workspace. Each run shows up as a session in the
+Console, with the full transcript.
 
-The key comes from the lab's Anthropic Console workspace. Usage is billed there, so keep
-a monthly spend limit on it.
+- Pause: `ant beta:deployments pause --deployment-id <depl_... from claude-lock.json>`
+- Run now: `ant beta:deployments run --deployment-id <same>`
+
+The GitHub token is a fine-grained token on the org with Contents, Pull requests and
+Issues set to read/write, and it expires. To replace it, update the vault credential
+with `ant beta:vaults:credentials update`.
 
 ## Layout
 
 ```
-.github/workflows/pr-agent.yml           the org-wide PR agent (reusable workflow)
-templates/claude-caller.yml              per-repo workflow that turns the agent on
+managed-agents/pr-agent/                 the org-wide PR agent (Console Managed Agent)
 .claude-plugin/marketplace.json          the catalogue: one entry per plugin
 plugins/<plugin>/.claude-plugin/plugin.json
 plugins/<plugin>/agents/<agent>.md       subagents

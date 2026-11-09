@@ -1,0 +1,14 @@
+# Sweeps the org for open PRs every hour, 8am-8pm Melbourne time, Monday-Friday.
+agent: ./agent.md
+environment_id: ./environment.yaml
+vault_ids: [vlt_011CgrkLxBgcaaor8AgM82Q1]   # the shocklab-pr-agent vault (vault.yaml)
+budget:
+  type: limit
+  max_list_cost: {amount: "300", currency: USD}   # hard cap per run: $3.00
+schedule: {type: cron, expression: "0 8-20 * * 1-5", timezone: Australia/Melbourne}
+initial_events:
+  - type: user.message
+    content:
+      - type: text
+        text: |
+          Run your sweep of open pull requests in the ShockLab-TestHub org now.

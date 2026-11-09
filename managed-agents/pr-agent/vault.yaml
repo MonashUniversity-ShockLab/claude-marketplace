@@ -1,0 +1,3 @@
+# Holds the GitHub token as GH_TOKEN (added separately; never in this file).
+type: vault
+display_name: shocklab-pr-agent
