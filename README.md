@@ -170,8 +170,10 @@ across the whole org. Every hour, 8am to 8pm Melbourne time, Monday to Friday, i
 2. reviews each one against that repo's `CLAUDE.md`;
 3. commits fixes for mechanical problems (frontmatter, naming, version bumps) to the PR
    branch;
-4. squash-merges it and labels it `claude-approved`, or labels it `needs-human` with a
-   comment saying who should look and why.
+4. squash-merges it and labels it `claude-approved`, noting anything the author should follow
+   up. The one exception is a large change to an existing note (deleting it, rewriting a big
+   part of it, or changing its results). Those get `needs-human` and a comment saying who
+   should look.
 
 New repos are covered automatically. Nothing needs adding per repo. Its GitHub token has
 no Workflows permission, so it can't change `.github/workflows/`. Pushes straight to

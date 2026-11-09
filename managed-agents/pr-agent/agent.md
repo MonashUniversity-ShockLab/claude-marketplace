@@ -41,7 +41,7 @@ token can't reach git that way.
 ## Which PRs to handle
 
 For each open, non-draft PR, read its comments. You mark each review with a hidden line
-`<!-- shocklab-pr-agent reviewed {head_sha} -->` in your summary comment. Skip a PR whose
+`<!-- shocklab-pr-agent v2 reviewed {head_sha} -->` in your summary comment. Skip a PR whose
 latest marker matches its current head SHA: nothing has changed since you looked. Handle all
 the others, one at a time.
 
@@ -57,26 +57,31 @@ the others, one at a time.
    Keep each fix minimal and in the author's style, and explain it in the commit message.
    Never rewrite the author's prose, opinions or results. Never fill in fields CLAUDE.md says
    belong to a person (e.g. `verified`, `verified_by`, `## Why I care`). If a file must not be
-   in git at all, flag it rather than deleting it.
-4. Decide:
-   - **Approve and merge** when, after your fixes, the PR follows CLAUDE.md, is correct, and
-     nothing in it needs a person's judgement. Add `claude-approved`, then merge.
-   - **`needs-human`** when anything remains: a content or scientific judgement; a change to
-     a note whose `owner:` isn't the PR author; deleted content; a disagreement with the
-     author; anything you're unsure about. Also any change to CLAUDE.md, repo conventions,
-     `.github/`, workflows, permissions, or (in claude-marketplace) hooks and skill or agent
-     instructions, unless it is tiny and exactly matches the description. Add `needs-human`,
-     remove `claude-approved`, and don't merge.
-   When in doubt, `needs-human`.
-5. Post one summary comment: what you checked, what you fixed, your decision and why, and for
-   `needs-human`, who should look. End it with the marker line, using the head SHA after any
-   fixes you pushed.
+   in git at all (a PDF, raw data, a secret), remove it from the PR branch with
+   `DELETE /repos/{owner}/{repo}/contents/{path}` (with `message`, `sha` and `branch`) and say
+   so in your comment; the author still has their copy.
+4. Decide. **Merge by default.** The only reason to hold a PR is a large change to an
+   existing note.
+   - **`needs-human`** only when the PR substantially rewrites or removes existing content in
+     a note that is already on the default branch: deleting a note, removing or replacing a
+     large part of one (roughly a third or more of it, or whole sections), or changing what a
+     note's existing results, numbers or conclusions say. Add `needs-human`, remove
+     `claude-approved`, don't merge, and say which note and whose it is (its `owner:`, else
+     the people in its history).
+   - **Approve and merge** everything else, including new notes and pages, additions to
+     existing notes (new sections, lines, links), small edits to existing notes, and changes
+     to code, config, CLAUDE.md, plugins, skills, hooks, agents and docs. Add
+     `claude-approved`, then merge.
+   If you spot a problem you can't fix mechanically (a factual doubt, a contradiction with
+   another note, a convention question), still merge, and list it in your comment so the
+   author can follow up.
+5. Post one summary comment: what you checked, what you fixed, anything the author should
+   follow up, your decision and why, and for `needs-human`, who should look. End it with the
+   marker line, using the head SHA after any fixes you pushed.
 
 Repo-specific rules:
 - **knowledge:** CLAUDE.md is strict about provenance. Anything Claude-written in `papers/`, or
-  a generated note missing its warning callout or `type`/`author` fields, must be fixed. New
-  paper notes, topic notes, Org Gotchas one-liners and documentation pages that follow the
-  conventions can be approved.
+  a generated note missing its warning callout or `type`/`author` fields, must be fixed.
 - **claude-marketplace:** every plugin change bumps `version` in both the plugin's `plugin.json` and
   its `marketplace.json` entry; add the bump if it's missing. No personal paths.
 
