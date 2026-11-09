@@ -102,7 +102,7 @@ Papers close gaps only where someone has already done the work. For the rest, de
 2. **Derive what each hypothesis predicts.** For each target, find an observable where the competing hypotheses predict *different* outcomes: a frequency or its scaling with M_j, a mode shape or azimuthal order, a phase relation or convective velocity, a hysteresis loop, a switch rate or dwell-time distribution, a growth rate. Write the prediction under each hypothesis, quantitative where the notes, data tables or a scaling estimate allow (label your own estimates). If every hypothesis predicts the same thing, that test can't settle the point; look for another one.
 3. **Check it hasn't been done.** Search the library (`library.py find`, Grep) for a paper that already ran the test. If one did, it is evidence for section 3, not a proposal; if it was run under other conditions, say what the new test adds.
 4. **Design the cheapest decisive test**, in roughly this order of cost:
-   - **re-analysis** of data the lab already has (SPOD, BMD, POD pairs, HPOD, the hybrid SPOD → reconstruction → HPOD pipeline), or of published numbers in `data/*.csv`;
+   - **re-analysis** of data the lab already has (SPOD, BMD, POD pairs), or of published numbers in `data/*.csv`;
    - **synthetic benchmark** with a known ground truth, when the question is whether a method can see the effect at all;
    - **model calculation**: vortex-sheet or other linear stability, resolvent, shock-cell or feedback models, run at the conditions in question;
    - **simulation**: the user's own simulations (if their `CLAUDE.md` lists any), or a request for LES data from another group;
