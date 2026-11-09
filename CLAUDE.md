@@ -51,11 +51,11 @@ Then confirm git can read the repos without prompting:
 `GIT_TERMINAL_PROMPT=0 git ls-remote https://github.com/MonashUniversity-ShockLab/claude-marketplace.git HEAD`
 (in PowerShell, set `$env:GIT_TERMINAL_PROMPT=0` first).
 
-### 5. Marketplace and plugin in user settings
+### 5. Marketplace and plugins in user settings
 
 Check `~/.claude/settings.json` (`C:\Users\<you>\.claude\settings.json` on Windows). If
-`extraKnownMarketplaces.shocklab` or `enabledPlugins["shocklab-core@shocklab"]` is
-missing, add:
+`extraKnownMarketplaces.shocklab`, `enabledPlugins["shocklab-core@shocklab"]` or
+`enabledPlugins["shocklab-library@shocklab"]` is missing, add:
 
 ```json
 {
@@ -66,10 +66,17 @@ missing, add:
     }
   },
   "enabledPlugins": {
-    "shocklab-core@shocklab": true
+    "shocklab-core@shocklab": true,
+    "shocklab-library@shocklab": true
   }
 }
 ```
+
+`shocklab-core` is for everyone. `shocklab-library` (the paper-library skills: `/lit` and
+`/research-question` for everyone; `/add-paper`, `/paper-audit` and `/restructure-note`,
+which change the notes, for maintainers only) is on by default, as in the library's
+`onboarding/Getting started.md`; it needs the library clone and `SHOCKLAB_KNOWLEDGE` from
+step 6. Leave it out only if they say they won't read papers.
 
 - It's their personal config, so ask before writing.
 - Merge into the existing JSON. Don't change or drop other keys. If `enabledPlugins` or
@@ -80,11 +87,6 @@ missing, add:
 Then offer the optional plugins listed in `README.md`, and add the ones they want to
 `enabledPlugins`:
 
-- `"shocklab-library@shocklab": true`: the paper-library skills (`/lit`,
-  `/research-question`, `/add-paper`, `/paper-audit`, `/restructure-note`). Recommend it
-  to anyone who reads papers; it needs the library clone from step 6. `/lit` and
-  `/research-question` are for everyone; the other three change the notes and are for
-  maintainers only.
 - `"shocklab-apps@shocklab": true`: `/queue` and `/enact-queue`, for people who build
   apps with a `FEATURE_QUEUE.md`.
 - `"shocklab-figures@shocklab": true`: the `figure-master` agent, which needs MATLAB,
@@ -118,14 +120,21 @@ On Windows, use forward slashes or escaped backslashes in the JSON string.
 (with `_Unprocessed`, `_Off_Topic`, `_Deferred` and the topic folders). Offer to copy the
 whole folder's contents into `<parent>/Library_of_Shock_Lab/attachments/papers/`, which git
 ignores (e.g. `robocopy "Z:\Library_of_Shock_Lab\papers" "<clone>\attachments\papers" /E /XC /XN /XO`
-on Windows, which never overwrites a newer local file). Ask first; it is about 1 GB. If
+on Windows, or `rsync -a --ignore-existing "<market>/Library_of_Shock_Lab/papers/" "<clone>/attachments/papers/"`
+on macOS/Linux; both copy only files they don't have yet and never overwrite one already in
+the clone). Ask first; it is about 1 GB the first time. Tell them to re-run the same
+command after every `git pull` to get PDFs for new notes. If
 `Z:` isn't mapped, ask them where Market is mounted. Paper notes embed PDFs from there,
 by the paths in the notes' `pdf:` fields. Papers they don't have show a "not found"
 placeholder, which is expected.
 
 `Misc/` is personal working space for the library skills, kept in the member's personal
 folder (`SHOCKLAB_PERSONAL`, else `../My_Knowledgebase` next to the clone if it exists, else
-the clone itself, where it is git-ignored): never committed to the shared repo. Research
+the clone itself, where it is git-ignored): never committed to the shared repo. Offer to
+create an empty `My_Knowledgebase` folder next to the clone (or to set `SHOCKLAB_PERSONAL`
+in the same `env` block). Project-specific paper relevance also goes there, in
+`Project_Paper_Relevance/`: since 2026-11-09 the notes' "Relevance to this project"
+sections cover only the group's research threads. Research
 questions are shared: `/research-question` saves them in the clone's `research_questions/`
 with an `author:` field, and any member may add one on a branch with a PR (just the
 question file and its README row; never someone else's question without asking them).
