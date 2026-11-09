@@ -32,8 +32,9 @@ credentials for GitHub on your machine (`gh auth login` then `gh auth setup-git`
 
 `SHOCKLAB_KNOWLEDGE` is the absolute path of your clone of
 [`Library_of_Shock_Lab`](https://github.com/MonashUniversity-ShockLab/Library_of_Shock_Lab)
-(forward slashes on Windows). `shocklab-library` and `shocklab-apps` are optional; drop
-their lines if you don't want them.
+(forward slashes on Windows). `shocklab-core` is for everyone and `shocklab-library` is
+recommended for anyone who reads papers; `shocklab-apps` is optional, so drop its line if
+you don't want it.
 
 This works in the terminal, the Claude desktop app and VS Code alike, needs no
 `claude` CLI, and `autoUpdate` keeps the plugins current. Start a new session afterwards;
@@ -111,7 +112,11 @@ non-obvious and org-specific, offer to record it there once my task is done.
 2. Copy the PDFs: the contents of the Market folder `Z:\Library_of_Shock_Lab\papers`
    (including `_Unprocessed`, `_Off_Topic` and `_Deferred`) go into
    `attachments/papers/` in your clone. Git ignores that folder. Copy again after a
-   `git pull` to get PDFs for new notes.
+   `git pull` to get PDFs for new notes. On Windows:
+   `robocopy "Z:\Library_of_Shock_Lab\papers" "<clone>\attachments\papers" /E /XC /XN /XO`;
+   on macOS/Linux:
+   `rsync -a --ignore-existing "<market>/Library_of_Shock_Lab/papers/" "<clone>/attachments/papers/"`.
+   Both copy only files you don't have yet and never overwrite one in your clone.
 3. Set `SHOCKLAB_KNOWLEDGE` to the clone's absolute path (the `env` block above).
 4. Python 3 on PATH (standard library only) runs `tools/library.py`; `pdftotext` and
    `pdfinfo` (Poppler, MiKTeX or TeX Live) are needed by `/add-paper` and `/paper-audit` (maintainers).
