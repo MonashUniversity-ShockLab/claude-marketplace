@@ -29,6 +29,8 @@ The helper scripts need only standard Python 3: run them as `python <library>/to
 
 **Personal files.** `<personal>` is the user's personal folder for these files, outside the shared repo: the path in the environment variable `SHOCKLAB_PERSONAL` if it is set, else `My_Knowledgebase/` next to the library (`<library>/../My_Knowledgebase`) if it exists, else `<library>` itself (the old layout, where `Misc/` is git-ignored). Research questions are not personal: they are shared in `<library>/research_questions/`, each with its `author`. The library tools find it the same way (`library.personal_dir()` in `<library>/tools/library.py`). The ledger `<personal>/Misc/restructure_ledger.tsv`, the flags file `<personal>/Misc/restructure_flags.md`, and the audit ledger and `notes_to_update.md` it reads, are the user's own working files: not part of the shared repo and never committed to it. Create the ledger and flags file when missing (headers below).
 
+**Project relevance.** A restructure changes no content, so it neither adds project text nor moves existing project text out of a note (that would fail `restructure_check.py compare`). Project-specific Relevance text stays where it is; the next `/paper-audit` of the note moves it to the user's `<personal>/Project_Paper_Relevance/` files (see "Project relevance is personal" in the add-paper skill).
+
 ## Settings
 
 | Setting | Value | Why |
