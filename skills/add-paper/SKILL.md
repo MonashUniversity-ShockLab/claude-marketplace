@@ -1,10 +1,12 @@
 ---
 name: add-paper
-description: Index every PDF in a folder (default <library>/attachments/papers in the Shock Lab paper library found via $SHOCKLAB_KNOWLEDGE, or any folder the user names) that has no note yet. Each paper is read once, its PDF renamed to Authors_Year_Title.pdf, and turned into a structured Markdown note with frontmatter; the paper is then worked into the topic pages and data tables, and the index and BibTeX are rebuilt, so later sessions never need the PDF. Ends with a branch and pull request to the shared Library_of_Shock_Lab repo. Use when the user runs /add-paper, says "add/index the new papers", or points at a folder of papers.
+description: Index every PDF in a folder (default <library>/attachments/papers in the Shock Lab paper library found via $SHOCKLAB_KNOWLEDGE, or any folder the user names) that has no note yet. Each paper is read once, its PDF renamed to Authors_Year_Title.pdf, and turned into a structured Markdown note with frontmatter; the paper is then worked into the topic pages and data tables, and the index and BibTeX are rebuilt, so later sessions never need the PDF. Maintainers only: ends with a push to the shared Library_of_Shock_Lab repo and the filed PDFs copied to the Market folder. Students request papers by putting the PDF in Market _Unprocessed instead. Use when the user runs /add-paper, says "add/index the new papers", or points at a folder of papers.
 argument-hint: "[optional: a folder to scan, or specific PDF file(s) to (re)index]"
 ---
 
 # Index new papers
+
+**Maintainers only.** A maintainer is someone with push access to the shared library repo who says so, or whose own `CLAUDE.md` says so. If the user is not a maintainer, don't run this skill: tell them to put the PDF in the Market folder `Z:\Library_of_Shock_Lab\papers\_Unprocessed\`, where a maintainer will process it, and stop. If it isn't clear, ask once.
 
 Goal: read each PDF **once**, carefully, and capture everything a later session would need, so the PDF only has to be reopened for exact wording or figures. Then fold the paper into the library's synthesis (topic pages, data tables), so the library keeps getting more useful rather than just longer.
 
@@ -20,9 +22,9 @@ If none of these exists, stop and tell the user to clone the library and set `SH
 
 The helper scripts need only standard Python 3: run them as `python <library>/tools/library.py <command>`. If `python` is not on PATH, try `python3` or `py -3`, or the `python` of any conda env; ask the user once if none works.
 
-The library layout, frontmatter fields, controlled vocabulary and topic-page structure are in `<library>/SCHEMA.md`. Read it first. Below, `library.py` means `python <library>/tools/library.py`. The PDFs live in `<library>/attachments/papers/` (git-ignored): each member copies the group's Market folder `Z:\Library_of_Shock_Lab\papers` there, including its `_Unprocessed/`, `_Off_Topic/` and `_Deferred/` folders.
+The library layout, frontmatter fields, controlled vocabulary and topic-page structure are in `<library>/SCHEMA.md`. Read it first. Below, `library.py` means `python <library>/tools/library.py`. The PDFs live in `<library>/attachments/papers/` (git-ignored), whose layout matches the group's Market folder `Z:\Library_of_Shock_Lab\papers` exactly: topic folders plus `_Unprocessed/`, `_Off_Topic/` and `_Deferred/`. Students' paper requests arrive in Market `_Unprocessed/`.
 
-**Branch first.** Before writing anything, pull (`git -C <library> pull --ff-only`) and create a branch in `<library>` for this run (e.g. `add-paper/YYYY-MM-DD-<short>`), unless the user is a maintainer syncing from their own repo. All the commits below go on that branch.
+**Pull first.** Before writing anything, pull (`git -C <library> pull --ff-only`). Commit on the current branch (normally `main`) and push at the end. If the maintainer prefers a pull request, create a branch now (e.g. `add-paper/YYYY-MM-DD-<short>`) and put all the commits below on it. A maintainer who works in their own repo and reaches the shared repo through a weekly sync just commits there.
 
 **Personal files.** `<library>/Misc/` (e.g. `Papers_to_get.md`, `notes_to_update.md`, `group_papers.md`) and `<library>/research_questions/` are the user's own working files: not part of the shared repo, never committed to it. Create a file there when a step needs it and it is missing; skip a step whose file the user doesn't keep.
 
@@ -34,6 +36,12 @@ Before anything else, look in `<library>/paper_notes/_incoming/`:
 - `<key>.return.md` (with or without `<key>.md` beside it): a paper whose note was finished but not yet folded in. Fold these in first (section 3), before starting new papers. If `<key>.md` is no longer there, the note was already moved into `<library>/paper_notes/`; carry on with the fold, which is safe to repeat.
 - `<key>.md` with no `<key>.return.md`: an unfinished note (results files are written last). Delete it; its PDF shows up as unindexed again and is redone. Keep a `<key>.parts/` folder of chapter drafts, though, and let the redo reuse finished chapters.
 - If a topic page (`<library>/topics/*.md`, not `_queue/`) has uncommitted changes (`git status`), a page revision was cut off, or the user has been editing it. Don't revise or discard that page; leave it and report it.
+
+## 0a. Fetch requests from Market
+
+**Where Market is.** `<market>` below is the group's Market papers folder: the path in the environment variable `SHOCKLAB_MARKET_PAPERS` if set, else a path the user gives, else `Z:\Library_of_Shock_Lab\papers` (the usual Windows mapping; `/z/Library_of_Shock_Lab/papers` in Git Bash). If none of these is reachable (e.g. a cloud sandbox, or a Linux machine without the share mounted), say so and skip this step and the final Market step; the final report then lists the PDFs a maintainer must file on Market by hand. Use whichever shell is available (PowerShell or POSIX); the steps below say what to do, not which command.
+
+Unless `$ARGUMENTS` names a folder or files, list the PDFs in `<market>/_Unprocessed/`. If any are not already in `<library>/attachments/papers/_Unprocessed/`, offer to copy them there. **Copy, don't move**, and don't overwrite local files: the Market originals stay until the final step. Skip this if the user declines.
 
 ## 1. Find unindexed PDFs
 
@@ -97,11 +105,15 @@ Only the main session edits topic pages, data tables, `SCHEMA.md` and the genera
 7. Commit the new notes, the notes and topic pages changed in step 5a, queue files, data tables, `SCHEMA.md` (if changed), `INDEX.md` and `references.bib` together, on the run's branch. Stage these files by name, never `git add -A` or `git add .`, so nothing else in the working tree is swept in. Never stage anything under `Misc/` or `research_questions/` (personal; see above). Use `Add reference note: <short title>` for one paper, or `Add reference notes: <n> papers` for several. The PDFs stay untracked because `.gitignore` excludes `*.pdf*`, and PDFs outside the repo are never copied in.
 8. Only after the commit succeeds, delete the wave's `<key>.return.md` files.
 
-**Open a pull request.** When the run is done, show the user the branch's changes (`git -C <library> diff --stat main...HEAD`) and ask before pushing. Then push the branch and open a PR to `MonashUniversity-ShockLab/Library_of_Shock_Lab` (`gh pr create --fill`, adding the list below to the body). The org's PR agent reviews PRs against the repo's `CLAUDE.md` and merges or flags them. A maintainer syncing from their own repo may skip the branch and PR.
+**Push.** When the run is done, show the user the changes (`git -C <library> log --stat @{u}..HEAD`) and ask before pushing. Then `git -C <library> pull --rebase` and push. If the maintainer chose a branch, push it and open a PR to `MonashUniversity-ShockLab/Library_of_Shock_Lab` instead (`gh pr create --fill`, adding the list below to the body). A maintainer working through the weekly sync stops at the commit.
 
-**Share the renamed PDFs.** The notes' `pdf` fields now name the renamed and filed PDFs, which other members won't have. Offer to copy each new PDF from `<library>/attachments/papers/` to the same relative path under the Market folder `Z:\Library_of_Shock_Lab\papers\` (copy with `cp -n`, never overwrite or delete there), and say which old files in Market `_Unprocessed/` can then be removed by the user.
+**File the PDFs on Market.** Run this only after the library changes are pushed (or committed, for the weekly sync), so Market never gets ahead of the notes. If `<market>` isn't reachable (step 0a), skip it and list each PDF with its destination path for a maintainer to file by hand. Otherwise, for each PDF this run took from Market `_Unprocessed/` (step 0a) or newly filed under `<library>/attachments/papers/`:
+1. Its destination is `<market>/<rel>`, where `<rel>` is the note's `pdf` field (the path relative to `attachments/papers/`). A PDF moved to `_Off_Topic/` or `_Deferred/` goes to the same folder on Market. Create missing folders.
+2. If a file already exists there with the same size, it is already filed: skip the copy and count it as verified. A different file there is a collision: don't overwrite it, leave the `_Unprocessed` original, and report it.
+3. Otherwise copy it (never overwriting) and check that the copy's size matches the local file. If it doesn't, delete only that failed copy and report it.
+4. List the Market `_Unprocessed/` originals whose copy is verified (match each to its renamed copy through the results files' old filenames) and ask the user before removing them. Remove only those; never remove anything else on Market.
 
-Finish by listing each paper with its note link, its old → new PDF filename (and any rename that was skipped or failed), the existing mentions rewritten in step 5a (which files), the topic contributions queued (with the queue sizes now), any topic pages revised (and any change to the consensus or open questions), and the parts to check against the PDF.
+Finish by listing each paper with its note link, its old → new PDF filename (and any rename that was skipped or failed), its Market copy (filed and removed from `_Unprocessed`, or the collision or failure), the existing mentions rewritten in step 5a (which files), the topic contributions queued (with the queue sizes now), any topic pages revised (and any change to the consensus or open questions), and the parts to check against the PDF.
 
 ## Per-paper procedure
 

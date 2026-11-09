@@ -82,7 +82,9 @@ Then offer the optional plugins listed in `README.md`, and add the ones they wan
 
 - `"shocklab-library@shocklab": true`: the paper-library skills (`/lit`,
   `/research-question`, `/add-paper`, `/paper-audit`, `/restructure-note`). Recommend it
-  to anyone who reads or writes papers; it needs the library clone from step 6.
+  to anyone who reads papers; it needs the library clone from step 6. `/lit` and
+  `/research-question` are for everyone; the other three change the notes and are for
+  maintainers only.
 - `"shocklab-apps@shocklab": true`: `/queue` and `/enact-queue`, for people who build
   apps with a `FEATURE_QUEUE.md`.
 - `"shocklab-figures@shocklab": true`: the `figure-master` agent, which needs MATLAB,
@@ -137,9 +139,10 @@ Tell them:
   MATLAB job on M3" should make Claude consult the knowledge base and use
   `--ntasks=1 --cpus-per-task=16`.
 - If they enabled `shocklab-library`: `/lit <question>` answers from the paper library
-  with note and page citations. Skills that change the library (`/add-paper`,
-  `/paper-audit`, `/restructure-note`) work on a branch and open a PR, which the org's
-  PR agent reviews.
+  with note and page citations. To get a paper added, put its PDF in Market
+  `Z:\Library_of_Shock_Lab\papers\_Unprocessed\`; a maintainer processes it with
+  `/add-paper` and pushes the note. Skills that change the library (`/add-paper`,
+  `/paper-audit`, `/restructure-note`) are for maintainers only.
 - Read `onboarding/Getting started.md` and `CLAUDE.md` in the library clone.
 
 ## Working on plugins here

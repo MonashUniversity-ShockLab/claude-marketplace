@@ -1,11 +1,13 @@
 ---
 name: paper-audit
-description: Audit existing reference notes in the Shock Lab paper library (Library_of_Shock_Lab, found via $SHOCKLAB_KNOWLEDGE), oldest-indexed first, against their PDFs and everything the library has learned since; deepen and correct each note to today's /add-paper standard and repair what its earlier, thinner reading caused elsewhere (topic pages, other notes, data tables). Progress is kept in the user's personal Misc/paper_audit.tsv so runs resume; changes go to the shared repo as a pull request. Use only when the user runs /paper-audit or asks to audit or re-check the early paper notes.
+description: Audit existing reference notes in the Shock Lab paper library (Library_of_Shock_Lab, found via $SHOCKLAB_KNOWLEDGE), oldest-indexed first, against their PDFs and everything the library has learned since; deepen and correct each note to today's /add-paper standard and repair what its earlier, thinner reading caused elsewhere (topic pages, other notes, data tables). Progress is kept in the user's personal Misc/paper_audit.tsv so runs resume; maintainers only; changes are pushed to the shared repo. Use only when the user runs /paper-audit or asks to audit or re-check the early paper notes.
 argument-hint: "[N papers | <note key> ... | status | next] [--until YYYY-MM-DD] [--light] [--no-topics]"
 effort: high
 ---
 
 # Audit the early paper notes
+
+**Maintainers only.** This skill changes paper notes and topic pages, which only maintainers edit. A maintainer is someone with push access to the shared library repo who says so, or whose own `CLAUDE.md` says so. If the user is not a maintainer, don't run it: tell them to report a wrong note to a maintainer or in an issue (naming the note and the page of the paper), and stop. If it isn't clear, ask once.
 
 The first `/add-paper` waves (15 and 19 October 2026, 109 notes) were written before the library had topic pages, before much of the vocabulary existed, in waves of 16–36 papers, and with less depth than later waves (about 3,800 words a note against about 6,000). Their gaps may have spread: topic pages and later notes were built on them. This skill re-reads each paper and fixes both the note and what it misled. It works oldest-indexed first and keeps a ledger, so it can run a few papers at a time over many sessions.
 
@@ -23,7 +25,7 @@ The helper scripts need only standard Python 3: run them as `python <library>/to
 
 Library layout and vocabulary: `<library>/SCHEMA.md`. `library.py` means `python <library>/tools/library.py`. This skill reuses `/add-paper`'s procedures (the `add-paper` skill's `SKILL.md`, in the `add-paper/` folder next to this skill's own folder), referred to below as "add-paper §n".
 
-**Branch first.** Pull (`git -C <library> pull --ff-only`) and create a branch in `<library>` for the run (e.g. `paper-audit/YYYY-MM-DD`), unless the user is a maintainer syncing from their own repo. Every commit below goes on that branch, and the run ends with a pull request (section 4).
+**Pull first.** Pull (`git -C <library> pull --ff-only`) and commit on the current branch (normally `main`); the run ends with a push (section 4). If the maintainer prefers a pull request, create a branch now (e.g. `paper-audit/YYYY-MM-DD`) for every commit below. A maintainer working in their own repo for the weekly sync just commits there.
 
 **Personal files.** The ledger `<library>/Misc/paper_audit.tsv`, and `<library>/Misc/notes_to_update.md` and `notes_to_check.md`, are the user's own working files: not part of the shared repo and never committed to it. Create any that is missing (the ledger with a tab-separated header row of the columns `key`, `first_indexed`, `audited`, `mode`, `effort`, `words_before`, `words_after`, `outcome`, `changes`). Because the ledger is personal, two members can audit the same note; before a run, check open PRs to the shared repo (`gh pr list --repo MonashUniversity-ShockLab/Library_of_Shock_Lab --search "Audit"`) and skip notes already being audited there.
 
@@ -96,7 +98,7 @@ Steps 6–8 are scripted in `<library>/tools/audit_fold.py` (both safe to repeat
 10. **Mentions elsewhere:** if the PDF was renamed, update its old filename wherever it appears (add-paper §3 step 5a).
 11. `library.py file`, then `library.py build`, then `library.py check`. Fix every ERROR and the WARNs about the audited notes.
 12. **Ledger:** append one row per note to `<library>/Misc/paper_audit.tsv` (tab-separated, columns as its header): `key`, `first_indexed`, `audited` (today), `mode`, `effort`, `words_before`, `words_after`, `outcome`, `changes` (one short line: the main corrections and additions).
-13. **Commit** the audited notes and every file changed in steps 4–11, staged by name (never `git add -A` or `git add .`, and never anything under `Misc/` or `research_questions/`), on the run's branch: `Audit reference notes: <n> papers` (or `Audit reference note: <short title>`).
+13. **Commit** the audited notes and every file changed in steps 4–11, staged by name (never `git add -A` or `git add .`, and never anything under `Misc/` or `research_questions/`), on the current branch: `Audit reference notes: <n> papers` (or `Audit reference note: <short title>`).
 14. After the commit succeeds, delete the wave's `.audit.md` files.
 
 Then check the context budget before starting the next wave.
@@ -105,7 +107,7 @@ Then check the context budget before starting the next wave.
 
 - Unless `--no-topics`: revise the topic pages `library.py check` lists as due (10+ contributions or oldest over 3 weeks) or under "Major corrections queued" (section 3 step 6), once each, one `high` subagent per page (add-paper §3 step 3; it treats `## audit:` sections like paper contributions, except that the Papers line already exists and only its role text may change). Commit each page with its queue file as it finishes.
 - If `notes_to_update.md` lists 10 or more notes, apply them as add-paper §3 step 3a.
-- **Pull request.** Show the user `git -C <library> diff --stat main...HEAD` and ask before pushing. Then push the branch and open a PR to `MonashUniversity-ShockLab/Library_of_Shock_Lab` (`gh pr create`, with the report below as the body). The org's PR agent reviews it against the repo's `CLAUDE.md`. A maintainer syncing from their own repo may push directly instead.
+- **Push.** Show the user `git -C <library> log --stat @{u}..HEAD` and ask before pushing. Then `git -C <library> pull --rebase` and push. If the maintainer chose a branch, push it and open a PR to `MonashUniversity-ShockLab/Library_of_Shock_Lab` instead (`gh pr create`, with the report below as the body). For the weekly sync, stop at the commit.
 - If an audit renamed a PDF, offer to copy the renamed file to the same relative path under the Market folder `Z:\Library_of_Shock_Lab\papers\` (`cp -n`; never overwrite or delete there), so other members' copies match the note's `pdf` field.
 
 ## 5. Report
@@ -117,4 +119,4 @@ In chat, keep it short:
 - note updates queued for other notes;
 - anything skipped and why (uncommitted, no PDF, auditor output rejected);
 - progress: audited / total notes (and of the 109 early-wave notes), and the next notes in line;
-- why the run stopped (count reached, budget, cut-off), the commits and the PR link.
+- why the run stopped (count reached, budget, cut-off), the commits and whether they were pushed (or the PR link).

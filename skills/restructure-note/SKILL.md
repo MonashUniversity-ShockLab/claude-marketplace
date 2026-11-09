@@ -1,11 +1,13 @@
 ---
 name: restructure-note
-description: Reshape already-audited reference notes in the Shock Lab paper library (Library_of_Shock_Lab, found via $SHOCKLAB_KNOWLEDGE) to the add-paper Note template's structure and length rules (Summary, Key findings and Relevance first; own analysis in a late section; about 400–600 words per PDF page up to about 8,000), without reopening the PDF and without losing any number, page reference or link. Progress is kept in the user's personal Misc/restructure_ledger.tsv so runs resume; changes go to the shared repo as a pull request. Use only when the user runs /restructure-note or asks to restructure, reshape or shorten the audited notes.
+description: Reshape already-audited reference notes in the Shock Lab paper library (Library_of_Shock_Lab, found via $SHOCKLAB_KNOWLEDGE) to the add-paper Note template's structure and length rules (Summary, Key findings and Relevance first; own analysis in a late section; about 400–600 words per PDF page up to about 8,000), without reopening the PDF and without losing any number, page reference or link. Progress is kept in the user's personal Misc/restructure_ledger.tsv so runs resume; maintainers only; changes are pushed to the shared repo. Use only when the user runs /restructure-note or asks to restructure, reshape or shorten the audited notes.
 argument-hint: "[N notes | <note key> ... | status | next]"
 effort: high
 ---
 
 # Restructure audited notes
+
+**Maintainers only.** This skill changes paper notes, which only maintainers edit. A maintainer is someone with push access to the shared library repo who says so, or whose own `CLAUDE.md` says so. If the user is not a maintainer, don't run it: tell them to report a wrong note to a maintainer or in an issue (naming the note and the page of the paper), and stop. If it isn't clear, ask once.
 
 `/paper-audit` checked these notes line by line against their PDFs, so their content is trusted. What changed afterwards is the shape a note should have (the paragraphs after the Note template in the `add-paper` skill's `SKILL.md`, in the `add-paper/` folder next to this skill's own folder): Summary, Key findings and Relevance first and readable on their own in about 1,500–2,000 words; the writer's own derivations and worked examples in `## Own analysis` near the end; and about 400–600 words per PDF page, up to about 8,000. This skill reshapes a note to those rules **as an editing job only**: no PDF, nothing added, nothing corrected, nothing correct lost.
 
@@ -23,7 +25,7 @@ The helper scripts need only standard Python 3: run them as `python <library>/to
 
 `library.py` and `restructure_check.py` mean `python <library>/tools/<script>`.
 
-**Branch first.** Pull (`git -C <library> pull --ff-only`) and create a branch in `<library>` for the run (e.g. `restructure/YYYY-MM-DD`), unless the user is a maintainer syncing from their own repo. Every commit below goes on that branch, and the run ends with a pull request (section 3).
+**Pull first.** Pull (`git -C <library> pull --ff-only`) and commit on the current branch (normally `main`); the run ends with a push (section 3). If the maintainer prefers a pull request, create a branch now (e.g. `restructure/YYYY-MM-DD`) for every commit below. A maintainer working in their own repo for the weekly sync just commits there.
 
 **Personal files.** The ledger `<library>/Misc/restructure_ledger.tsv`, the flags file `<library>/Misc/restructure_flags.md`, and the audit ledger and `notes_to_update.md` it reads, are the user's own working files: not part of the shared repo and never committed to it. Create the ledger and flags file when missing (headers below).
 
@@ -48,7 +50,7 @@ From `$ARGUMENTS`:
 - **`next`:** the batch the next run would take, with words, pages and issues. Stop.
 - **`<note key> …`:** restructure those notes, even if in the ledger or not audited (say so if a note was never audited: its content hasn't been checked against the PDF, so the restructure only reshapes it).
 - **A number `N`**, or **empty:** under the reorder-only policy, run `reorder` mode on the next N (default 10) candidates by key (`reorder --write <keys>`), not subagents. Say that full restructures need the notes named.
-- **`reorder`:** run `restructure_check.py reorder --write`, then `library.py check`, and commit the moved notes by name, on the run's branch ("Restructure reference notes: Relevance moved up in <n> notes (script, no other change)"); the ledger is personal and stays uncommitted. Then open the pull request as in section 3. No subagents.
+- **`reorder`:** run `restructure_check.py reorder --write`, then `library.py check`, and commit the moved notes by name, on the current branch ("Restructure reference notes: Relevance moved up in <n> notes (script, no other change)"); the ledger is personal and stays uncommitted. Then push as in section 3. No subagents.
 
 ## 1. Gates
 
@@ -75,12 +77,12 @@ For each note:
 6. Append a ledger row to `Misc/restructure_ledger.tsv`, creating it with this header if missing: `key	restructured	words_before	words_after	pages	target	still_over	moved_to_own_analysis	note` (tab-separated; `still_over` yes/no; `note` one short line, e.g. the reason it is over target).
 7. Delete `<key>.result.md`.
 
-Then `library.py check` (it must show no new ERROR or WARN for these notes), and commit the wave's notes by name, on the run's branch (the ledger and flags file are personal and stay uncommitted): `git commit -m "Restructure reference notes: <n> notes (structure and length rules, no content change)" -- <paths>`. The notes' frontmatter is unchanged, so `INDEX.md` and `references.bib` need no rebuild.
+Then `library.py check` (it must show no new ERROR or WARN for these notes), and commit the wave's notes by name, on the current branch (the ledger and flags file are personal and stay uncommitted): `git commit -m "Restructure reference notes: <n> notes (structure and length rules, no content change)" -- <paths>`. The notes' frontmatter is unchanged, so `INDEX.md` and `references.bib` need no rebuild.
 
-After the last wave, show the user `git -C <library> diff --stat main...HEAD` and ask before pushing; then push the branch and open a PR to `MonashUniversity-ShockLab/Library_of_Shock_Lab` (`gh pr create`, with the report as the body). The org has a PR agent that reviews PRs against the repo's `CLAUDE.md`. A maintainer syncing from their own repo may push directly instead.
+After the last wave, show the user `git -C <library> log --stat @{u}..HEAD` and ask before pushing; then `git -C <library> pull --rebase` and push. If the maintainer chose a branch, push it and open a PR to `MonashUniversity-ShockLab/Library_of_Shock_Lab` instead (`gh pr create`, with the report as the body). For the weekly sync, stop at the commit.
 
 Context budget: as `/paper-audit` (stop starting waves once compacted or past about 200k).
 
 ## 4. Report
 
-Short, in chat: per note, words before → after, what moved to Own analysis, and whether it is still over target and why; notes rejected or skipped and why; new items in `restructure_flags.md`; progress (restructured / audited, candidates left) and the next notes; the commits and the PR link.
+Short, in chat: per note, words before → after, what moved to Own analysis, and whether it is still over target and why; notes rejected or skipped and why; new items in `restructure_flags.md`; progress (restructured / audited, candidates left) and the next notes; the commits and whether they were pushed (or the PR link).
