@@ -9,17 +9,17 @@
     "./managed-agents/pr-agent/agent.md": {
       "kind": "agent",
       "id": "agent_01LmfY5vkfC5KZX1xKWGMjYd",
-      "version": "1",
-      "hash": "cca55115a9662319c26a67ad8554e255",
-      "remote_hash": "0835abd0c1c2bbb3bc28b9d6dd53de52",
-      "stamp": "1"
+      "version": "2",
+      "hash": "aa066cf7590d08e200bb9b562d791fab",
+      "remote_hash": "1b44e617a5c08cf923397e98f1657216",
+      "stamp": "2"
     },
     "./managed-agents/pr-agent/deployment-hourly.yaml": {
       "kind": "deployment",
       "id": "depl_01EbZV1SohiPntjBKyL6QMK6",
-      "hash": "c4a0f656c132d1f7daccdba1a86d4e44",
-      "remote_hash": "c4a0f656c132d1f7daccdba1a86d4e44",
-      "stamp": "2026-11-09T05:00:34.790386Z"
+      "hash": "e4d22b3d9d7786cf116c148c1d5f884d",
+      "remote_hash": "e4d22b3d9d7786cf116c148c1d5f884d",
+      "stamp": "2026-11-09T05:42:49.916980Z"
     },
     "./managed-agents/pr-agent/environment.yaml": {
       "kind": "environment",
