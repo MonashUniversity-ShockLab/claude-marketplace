@@ -1,6 +1,6 @@
 ---
 name: research-question
-description: Give an in-depth, reasoned answer to a research question (not a literature summary), working deeply through the Shock Lab paper library's topic pages and notes (Library_of_Shock_Lab, found via $SHOCKLAB_KNOWLEDGE), finding and fetching papers that would close gaps, proposing tests that would prove or disprove the hypotheses, and saving the answer with its sources in the user's personal <personal>/research_questions/ for later reference. Uncertainties, unknowns and conflicts in the literature are stated explicitly. Use only when the user runs /research-question, or asks to continue or revisit a saved research question.
+description: Give an in-depth, reasoned answer to a research question (not a literature summary), working deeply through the Shock Lab paper library's topic pages and notes (Library_of_Shock_Lab, found via $SHOCKLAB_KNOWLEDGE), finding and fetching papers that would close gaps, proposing tests that would prove or disprove the hypotheses, and saving the answer with its sources in the shared library's <library>/research_questions/ (any member may add one) for later reference. Uncertainties, unknowns and conflicts in the literature are stated explicitly. Use only when the user runs /research-question, or asks to continue or revisit a saved research question.
 argument-hint: "<question>  |  continue <slug> [notes]  |  list"
 effort: high
 ---
@@ -21,7 +21,14 @@ If none of these exists, stop and tell the user to clone the library and set `SH
 
 The helper scripts need only standard Python 3: run them as `python <library>/tools/library.py <command>`. If `python` is not on PATH, try `python3` or `py -3`, or the `python` of any conda env; ask the user once if none works.
 
-Answers are saved in `<personal>/research_questions/` (layout in its `README.md`), so the user and later sessions can pick them up again. `<personal>` is the user's personal folder for these files, outside the shared repo: the path in the environment variable `SHOCKLAB_PERSONAL` if it is set, else `My_Knowledgebase/` next to the library (`<library>/../My_Knowledgebase`) if it exists, else `<library>` itself (the old layout, where `Misc/` and `research_questions/` are git-ignored). The library tools find it the same way (`library.personal_dir()` in `<library>/tools/library.py`). That folder, like `<personal>/Misc/`, is the user's own: its content is **not** part of the shared repo and is never committed to it. If the folder or its `README.md` is missing, create them; the README is a short line saying what the folder holds and a table with columns `Question | Status | Updated`.
+Answers are saved in `<library>/research_questions/` (layout and table in its `README.md`), so the user, later sessions and other group members can pick them up again. Research questions are **shared** in the library repo (rules in `<library>/SCHEMA.md`, "Research questions", and the library's `CLAUDE.md`):
+
+- **Any member may add one.** Each question names its author in the frontmatter field `author:` (the user's full name; ask once if you don't know it).
+- **Never edit someone else's question** (an `author` other than the user) without the user confirming that its author agreed; offer a new question that builds on it instead.
+- They cite paper notes and topic pages, may be directed at the user's own project, and are **not citable literature**.
+- The library folders (`paper_notes/`, `topics/` including `topics/_queue/`, `data/`, `INDEX.md`, `references.bib`) stay maintainer-only (section 6a).
+
+`<personal>` is the user's personal folder for working files outside the shared repo (only `<personal>/Misc/` is used here): the path in the environment variable `SHOCKLAB_PERSONAL` if it is set, else `My_Knowledgebase/` next to the library (`<library>/../My_Knowledgebase`) if it exists, else `<library>` itself (where `Misc/` is git-ignored). The library tools find it the same way (`library.personal_dir()` in `<library>/tools/library.py`); its content is never committed to the shared repo. If `<library>/research_questions/README.md` is missing, create it: a short line saying what the folder holds and a table with columns `Question | Author | Status | Updated`.
 
 The user's own research and projects (what they work on, their data, codes and simulations) are described in their own `CLAUDE.md`; read it for the kind of answer and tests that would help them.
 
@@ -30,8 +37,8 @@ Library layout, frontmatter and tag vocabulary: `<library>/SCHEMA.md`. Search to
 ## 0. Which mode
 
 From `$ARGUMENTS`:
-- **`list`**: print the table in `<personal>/research_questions/README.md` and stop.
-- **`continue <slug> [notes]`** (or the user asks to continue a saved question): read `<personal>/research_questions/<slug>.md`, go to section 5.
+- **`list`**: print the table in `<library>/research_questions/README.md` and stop.
+- **`continue <slug> [notes]`** (or the user asks to continue a saved question): read `<library>/research_questions/<slug>.md`, go to section 5. If its `author` is not the user, ask first (see above).
 - **Anything else** is a new question. Check the README table for an existing question that covers it; if there is one, say so and ask whether to continue it or start a new one. Otherwise pick a short kebab-case slug, and go to section 0a.
 
 ## 0a. Clarifying questions
@@ -122,12 +129,13 @@ Propose only; don't run or build the tests here. The user may take one up as a f
 
 ## 6. Write and save
 
-Write `<personal>/research_questions/<slug>.md` (overwrite on continue, keeping the log) with this structure:
+Write `<library>/research_questions/<slug>.md` (overwrite on continue, keeping the log) with this structure:
 
 ```
 ---
 question: "<the question as the user asked it>"
 slug: <slug>
+author: <the user's full name>
 status: answered | partial | awaiting-papers
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
@@ -160,24 +168,29 @@ Then one subsection per test: hypotheses and their predictions, what is varied a
 (Paper | DOI | why it matters | status: requested / processed on YYYY-MM-DD.)
 
 ## Sources
-(Every topic page and note cited, as links: [Author Year](../../Library_of_Shock_Lab/paper_notes/<key>.md). Papers cited from outside the library are listed separately, labelled "not in the library".)
+(Every topic page and note cited, as links: [Author Year](../paper_notes/<key>.md). Papers cited from outside the library are listed separately, labelled "not in the library".)
+
+## Suggested library updates
+(Non-maintainers only, from section 6a: the topic-page and note changes for a maintainer to queue. Omit the section if there are none or the user is a maintainer.)
 
 ## Log
 - YYYY-MM-DD: created / continued (what was added or changed).
 ```
 
-Citation form in the body: [Author Year](../../Library_of_Shock_Lab/paper_notes/<key>.md), p. N (with the default layout the file sits in `My_Knowledgebase/research_questions/` next to the library clone `Library_of_Shock_Lab/`; otherwise use the relative path from `<personal>/research_questions/` to `<library>/paper_notes/`, and likewise for topic pages). Topic pages and notes that link back to a question use `../../My_Knowledgebase/research_questions/<slug>.md`; those links are broken in the shared repo, which is expected. Never present background knowledge as coming from a note; flag anything a note marks as unverified or figure-read.
+Citation form in the body: [Author Year](../paper_notes/<key>.md), p. N; topic pages `../topics/<page>.md`. Links to the user's own files outside the library (project code, `<personal>/`) won't resolve for other members, so keep them few and name the file in text too. Topic pages and notes that link back to a question use `../research_questions/<slug>.md`. Never present background knowledge as coming from a note; flag anything a note marks as unverified or figure-read.
 
 Then:
-1. Add or update the question's row in the table in `<personal>/research_questions/README.md` (slug link, question, status, updated date).
+1. Add or update the question's row in the table in `<library>/research_questions/README.md` (slug link, question, author, status, updated date).
 2. **Queue what the library should learn** (section 6a). Don't edit topic pages or notes yourself.
-3. The question file, its README and `<personal>/Misc/Papers_to_get.md` are personal: never commit them to the shared repo (if the user keeps them in a repo of their own, commit them there). The queue files from section 6a are shared, and only maintainers write them. A maintainer commits them by name on the current branch (`Research question: <slug>`, or `… (continued)`), shows the diff and pushes on the go-ahead (or opens a PR if they prefer; for the weekly sync, stop at the commit).
+3. **Commit** (stage by name; never `git add -A` or `git add .`; `<personal>/Misc/` is never committed):
+   - **Anyone who is not a maintainer:** on a new branch `research-question/<slug>` from an up-to-date `main` (`git -C <library> pull` first), commit only the question file and `research_questions/README.md` (`Research question: <slug>`, or `… (continued)`). Nothing in `paper_notes/`, `topics/`, `data/`, `INDEX.md` or `references.bib`. Show the diff, and on the user's go-ahead push the branch and open a pull request (`gh pr create`), with the question's short answer as the description.
+   - **A maintainer** commits the question file, the README and the queue files from section 6a by name on the current branch, shows the diff and pushes on the go-ahead (or opens a PR if they prefer; for the weekly sync, stop at the commit).
 
 ## 6a. Queue updates to topic pages and notes
 
 The answer usually produces knowledge the library lacks. Queue it, so `/add-paper` works it in during its next batch revision; this skill never revises topic pages or notes itself. Only maintainers write the queue files. A maintainer is someone with push access to the shared library repo who says so, or whose own `CLAUDE.md` says so. For anyone else, put the same sections under "## Suggested library updates" in the question file instead, and tell the user to pass them to a maintainer. Queue only what is new and backed by the notes, not a restatement of what the page already says, and nothing that rests only on your own reasoning unless it is labelled as such (e.g. a proposed explanation for a conflict). On `continue`, replace the question's earlier queue entries if they are still in the queue files, rather than adding a second set.
 
-- **Topic pages:** for each topic page the answer adds to, append to `<library>/topics/_queue/<topic>.md` (create it if missing) a section headed `## research-question: <slug> (queued YYYY-MM-DD)`, holding 3–8 sentences: what to add or change (a cross-paper comparison, an explanation of a conflict, a sharper or new open question, a point that should move between consensus and dispute, an error on the page), which section of the page it belongs in, and the supporting notes with page refs (links relative to the queue file: `../../paper_notes/<key>.md`). Make the section self-contained, because other members don't have the question file: say in a sentence what the question was. Link the question file (`../research_questions/<slug>.md`) only if the user keeps research questions in the shared repo. These count toward the page's revision threshold like paper contributions.
+- **Topic pages:** for each topic page the answer adds to, append to `<library>/topics/_queue/<topic>.md` (create it if missing) a section headed `## research-question: <slug> (queued YYYY-MM-DD)`, holding 3–8 sentences: what to add or change (a cross-paper comparison, an explanation of a conflict, a sharper or new open question, a point that should move between consensus and dispute, an error on the page), which section of the page it belongs in, and the supporting notes with page refs (links relative to the queue file: `../../paper_notes/<key>.md`). Make the section self-contained: say in a sentence what the question was. End with a link to the question file: `../../research_questions/<slug>.md`. These count toward the page's revision threshold like paper contributions.
 - **Notes:** for each note that should change, add bullets under `## <note key>` in the user's personal `<personal>/Misc/notes_to_update.md` (create it if missing; it feeds a maintainer's next `/add-paper` or `/paper-audit` run; non-maintainers add these to the question file's suggestions instead) (create the section if missing), in the format that file describes: `- (rq <slug>, YYYY-MM-DD) <change>`. Typical changes: a `related` link or cross-reference to a note it agrees or conflicts with, a number that is inconsistent with another note, a missing caveat on the conditions a finding holds under. Prefix with `[PDF]` anything that needs the PDF to confirm.
 - List what was queued (topic pages and notes) under "## Log" in the question file, and in the reply.
 

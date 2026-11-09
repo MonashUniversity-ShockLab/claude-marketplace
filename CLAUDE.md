@@ -123,10 +123,12 @@ on Windows, which never overwrites a newer local file). Ask first; it is about 1
 by the paths in the notes' `pdf:` fields. Papers they don't have show a "not found"
 placeholder, which is expected.
 
-`Misc/` and `research_questions/` are personal working space for the library skills, kept
-in the member's personal folder (`SHOCKLAB_PERSONAL`, else `../My_Knowledgebase` next to the
-clone if it exists, else the clone itself, where they are git-ignored): never committed to
-the shared repo.
+`Misc/` is personal working space for the library skills, kept in the member's personal
+folder (`SHOCKLAB_PERSONAL`, else `../My_Knowledgebase` next to the clone if it exists, else
+the clone itself, where it is git-ignored): never committed to the shared repo. Research
+questions are shared: `/research-question` saves them in the clone's `research_questions/`
+with an `author:` field, and any member may add one on a branch with a PR (just the
+question file and its README row; never someone else's question without asking them).
 
 Optional: suggest opening the clone as an Obsidian vault with the Dataview plugin.
 

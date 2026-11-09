@@ -88,5 +88,6 @@ preferences, anything project-private.
 - Show the user the diff and ask before committing or pushing; it's a repo the whole lab
   shares. Pull, commit small on a branch, push it and open a PR; the org has a PR agent
   that reviews PRs against the repo's `CLAUDE.md`.
-- `Misc/` and `research_questions/` in a clone are the member's personal working space;
-  never commit them.
+- `Misc/` in a clone is the member's personal working space; never commit it.
+  `research_questions/` is shared: any member may add one (with `/research-question`, on a
+  branch with a PR); don't edit another member's question without asking them.
