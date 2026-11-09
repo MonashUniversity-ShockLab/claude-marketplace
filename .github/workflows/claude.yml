@@ -1,0 +1,31 @@
+# Turns on the ShockLab PR agent for this repo. The agent itself lives in
+# .github/workflows/pr-agent.yml; this file only calls it.
+
+name: Claude PR agent
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  agent:
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+    uses: ShockLab-TestHub/claude-agents/.github/workflows/pr-agent.yml@main
+    secrets: inherit
+    with:
+      # Repo-specific rules on top of the repo's CLAUDE.md. Leave empty if none.
+      repo_rules: |
+        claude-agents rules: every plugin change bumps `version` in both the
+        plugin's plugin.json and its marketplace.json entry (fix this if missing).
+        No personal paths or files only one person has. A change to hooks/ or to a
+        skill or agent's instructions alters every member's Claude on their next
+        session: approve it only if it is small and clearly matches the PR
+        description; otherwise needs-human.
