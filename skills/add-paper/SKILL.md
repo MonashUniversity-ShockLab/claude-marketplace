@@ -139,7 +139,7 @@ Finish by listing each paper with its note link, its old → new PDF filename (a
 (frontmatter: every field in SCHEMA.md, each value a JSON literal)
 ---
 # <Title>
-![](../attachments/papers/<pdf field, spaces as %20>)   (PDF embed, directly under the title; see SCHEMA.md)
+![[attachments/papers/<pdf field>]]   (PDF embed, directly under the title; see SCHEMA.md)
 - **Authors / Source / DOI or arXiv / PDF (index key, page count) / Tags**
 ## Summary              (3–5 sentences, own words)
 ## Key findings         (bullets with numbers, each with page refs "(p. N)"; the most important first)
