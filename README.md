@@ -20,10 +20,20 @@ credentials for GitHub on your machine (`gh auth login` then `gh auth setup-git`
     }
   },
   "enabledPlugins": {
-    "shocklab-core@shocklab": true
+    "shocklab-core@shocklab": true,
+    "shocklab-library@shocklab": true,
+    "shocklab-apps@shocklab": true
+  },
+  "env": {
+    "SHOCKLAB_KNOWLEDGE": "C:/path/to/Library_of_Shock_Lab"
   }
 }
 ```
+
+`SHOCKLAB_KNOWLEDGE` is the absolute path of your clone of
+[`Library_of_Shock_Lab`](https://github.com/MonashUniversity-ShockLab/Library_of_Shock_Lab)
+(forward slashes on Windows). `shocklab-library` and `shocklab-apps` are optional; drop
+their lines if you don't want them.
 
 This works in the terminal, the Claude desktop app and VS Code alike, needs no
 `claude` CLI, and `autoUpdate` keeps the plugins current. Start a new session afterwards;
@@ -34,8 +44,14 @@ Alternatively, in a terminal Claude Code session:
 ```
 /plugin marketplace add MonashUniversity-ShockLab/claude-marketplace
 /plugin install shocklab-core@shocklab
+/plugin install shocklab-library@shocklab
+/plugin install shocklab-apps@shocklab
 /plugin install shocklab-figures@shocklab
 ```
+
+On Claude Code 2.1.275 or later, one line also adds the marketplace, e.g.
+`/plugin install shocklab-library --marketplace MonashUniversity-ShockLab/claude-marketplace`
+(likewise `shocklab-apps`).
 
 `shocklab-figures` is optional. To get it with the settings route, add
 `"shocklab-figures@shocklab": true` to `enabledPlugins`. See
@@ -55,7 +71,9 @@ clone). Paste:
 
 | Plugin | What it gives you |
 |---|---|
-| `shocklab-core` | **Everyone should install this.** A start-of-session reminder plus the `lab-knowledge` skill: Claude checks the [knowledge base](https://github.com/MonashUniversity-ShockLab/knowledge) before working out anything org-specific (M3, Slurm, Strudel, Market, rigs), and offers to record what it learns so the next person doesn't have to |
+| `shocklab-core` | **Everyone should install this.** A start-of-session reminder plus the `lab-knowledge` skill: Claude checks the [knowledge base](https://github.com/MonashUniversity-ShockLab/Library_of_Shock_Lab) before working out anything org-specific (M3, Slurm, Strudel, Market, rigs) and points literature questions at `/lit`, and offers to record what it learns so the next person doesn't have to |
+| `shocklab-library` | Skills for the shared paper library (`Library_of_Shock_Lab`, found through `SHOCKLAB_KNOWLEDGE`): `/lit` (answer from the library, with note and page citations), `/research-question` (in-depth reasoned answer, saved to your own `research_questions/`), `/add-paper` (index new PDFs into notes, topic pages and data tables), `/paper-audit` and `/restructure-note` (bring older notes up to standard), plus the `paper-auditor` and `note-restructurer` agents they launch. The library-changing skills finish on a branch and open a PR to the library repo. See [Setting up the paper library](#setting-up-the-paper-library) |
+| `shocklab-apps` | `/queue` (add a request to an app's `FEATURE_QUEUE.md` for the next build) and `/enact-queue` (build every queued request with one version bump, using the build and test steps in the app's README). Works for any app folder in your repo that has, or gets, a `FEATURE_QUEUE.md` |
 | `shocklab-figures` | The `figure-master` agent: makes plots from data in the lab's MATLAB house style (Times 16 pt, LaTeX labels, `pogmap`/`CMRmap`, no titles), restyles existing ones, copies journal figures only after checking their licence and recreates them from data otherwise, then hands back a LaTeX figure block. Ships the `pogmap` and `CMRmap` colormaps. See [Setting up figure-master](#setting-up-figure-master) |
 
 ### How `shocklab-core` avoids duplicated work
@@ -82,9 +100,35 @@ If you'd rather not install the hook, put this in your user-level `~/.claude/CLA
 Before working out anything specific to the lab, Monash or its infrastructure (M3/MASSIVE,
 Slurm requests, Strudel, the Market drive, MATLAB on the cluster, lab rigs, cameras),
 check the ShockLab knowledge base first: start at `documentation/Org Gotchas.md` in
-MonashUniversity-ShockLab/knowledge (local clone, or `gh api`). After solving something
+MonashUniversity-ShockLab/Library_of_Shock_Lab (local clone, or `gh api`; for literature questions start at `INDEX.md` and `topics/`). After solving something
 non-obvious and org-specific, offer to record it there once my task is done.
 ```
+
+### Setting up the paper library
+
+1. Clone the library (not in a OneDrive or Dropbox folder):
+   `git -c core.longpaths=true clone https://github.com/MonashUniversity-ShockLab/Library_of_Shock_Lab.git`
+2. Copy the PDFs: the contents of the Market folder `Z:\Library_of_Shock_Lab\papers`
+   (including `_Unprocessed`, `_Off_Topic` and `_Deferred`) go into
+   `attachments/papers/` in your clone. Git ignores that folder.
+3. Set `SHOCKLAB_KNOWLEDGE` to the clone's absolute path (the `env` block above).
+4. Python 3 on PATH (standard library only) runs `tools/library.py`; `pdftotext` and
+   `pdfinfo` (Poppler, MiKTeX or TeX Live) are needed by `/add-paper` and `/paper-audit`.
+
+`Misc/` (ledgers such as `paper_audit.tsv`, `restructure_ledger.tsv`, `Papers_to_get.md`)
+and `research_questions/` in your clone are personal: the skills create what they need
+there, and nothing in them is committed to the shared repo.
+
+### Using a skill without the plugin
+
+Every skill is one self-contained folder in [`skills/`](skills/) (`skills/<name>/SKILL.md`
+plus any files beside it), so an agent or a person can fetch one straight from this repo.
+To use one without installing a plugin, copy `skills/<name>/` into `~/.claude/skills/`
+(`C:\Users\<you>\.claude\skills\` on Windows), and any agent it launches from
+[`agents/`](agents/) into `~/.claude/agents/`. Copied this way they run as `/<name>` and
+their agents as `paper-auditor` / `note-restructurer` (without the `shocklab-library:`
+prefix). The library skills read each other's files from sibling folders, so copy
+`add-paper` and `lit` along with the others.
 
 ### Setting up figure-master
 
@@ -153,11 +197,32 @@ with `ant beta:vaults:credentials update`.
 ```
 managed-agents/pr-agent/                 the org-wide PR agent (Console Managed Agent)
 .claude-plugin/marketplace.json          the catalogue: one entry per plugin
+skills/<skill>/SKILL.md                  shared skills, one self-contained folder each
+agents/<agent>.md                        agents the shared skills launch
 plugins/<plugin>/.claude-plugin/plugin.json
 plugins/<plugin>/agents/<agent>.md       subagents
 plugins/<plugin>/skills/<skill>/SKILL.md skills
 plugins/<plugin>/commands/<cmd>.md       slash commands
 ```
+
+### How the top-level `skills/` and `agents/` become plugins
+
+`shocklab-library` and `shocklab-apps` have no folder under `plugins/`. Their
+marketplace entries are the manifest (there is no `plugin.json` for them, and they set
+`"strict": false`) and list exactly which skill folders and agent files they contain,
+as the [plugin manifest reference](https://code.claude.com/docs/en/plugins-reference)
+("Marketplace entries and the manifest") allows:
+
+- `shocklab-library` has `"source": "./"` (the repo root). When a root-source entry lists
+  `skills`, only those folders load; its `agents` list replaces the default `agents/` scan.
+- `shocklab-apps` has `"source": "./skills"`, with `skills` paths relative to that folder.
+  It can't use the repo root, because a root-source plugin with no agent files listed
+  would also pick up everything in `agents/`.
+
+Installed plugins are copied into the plugin cache, and a plugin can only reach files
+inside its own source folder, so the skills must stay inside the folder each entry names
+(no `..` paths). To add a skill to one of these plugins, put it in `skills/<name>/`, add
+its path to the entry's `skills` list, and bump the entry's `version`.
 
 ## Adding a plugin
 
@@ -167,5 +232,6 @@ plugins/<plugin>/commands/<cmd>.md       slash commands
    or read them from an environment variable or the project's `CLAUDE.md`.
 3. Add an entry to `.claude-plugin/marketplace.json`.
 4. Test locally: `/plugin marketplace add ./` from a clone, then install it.
-5. Bump `version` in both files when you change a plugin, so others get the update.
+5. Bump `version` in both files when you change a plugin, so others get the update
+   (for `shocklab-library` and `shocklab-apps`, the marketplace entry is the only place).
 6. Open a PR.

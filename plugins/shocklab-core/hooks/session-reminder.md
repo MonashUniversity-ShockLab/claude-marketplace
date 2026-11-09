@@ -1,3 +1,4 @@
-ShockLab (shocklab-core plugin): this user is in the ShockLab group, which keeps a shared knowledge base (MonashUniversity-ShockLab/knowledge) so nobody works out the same org-specific thing twice.
+ShockLab (shocklab-core plugin): this user is in the ShockLab group, which keeps a shared knowledge base and paper library (MonashUniversity-ShockLab/Library_of_Shock_Lab, local clone at $SHOCKLAB_KNOWLEDGE) so nobody works out the same org-specific thing twice.
 - Before working out anything specific to the lab, Monash or its infrastructure (M3/MASSIVE, Slurm requests, Strudel, the Market drive, MATLAB on the cluster, lab rigs, cameras, schlieren/PIV/calibration, SPOD), use the lab-knowledge skill to check the knowledge base first. Keep the check quick.
+- For literature questions (what papers say about screech, jet noise, impinging jets, modal methods, rocket noise, ...), use /lit if the shocklab-library plugin is installed; otherwise start at INDEX.md and topics/ in the library.
 - After solving something non-obvious and org-specific, offer to record it in the knowledge base once the user's task is done (lab-knowledge skill, section 3).

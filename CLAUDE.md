@@ -77,23 +77,31 @@ missing, add:
   it with just this block.
 - Check that the file still parses afterwards.
 
-Then offer the optional plugins listed in `README.md`. Today that is
-`shocklab-figures` (the `figure-master` agent), which needs MATLAB, plus `pdfimages` /
-`pdftoppm` for pulling figures out of papers. If they want it, add
-`"shocklab-figures@shocklab": true` to `enabledPlugins`. Its per-project setup is in the
+Then offer the optional plugins listed in `README.md`, and add the ones they want to
+`enabledPlugins`:
+
+- `"shocklab-library@shocklab": true`: the paper-library skills (`/lit`,
+  `/research-question`, `/add-paper`, `/paper-audit`, `/restructure-note`). Recommend it
+  to anyone who reads or writes papers; it needs the library clone from step 6.
+- `"shocklab-apps@shocklab": true`: `/queue` and `/enact-queue`, for people who build
+  apps with a `FEATURE_QUEUE.md`.
+- `"shocklab-figures@shocklab": true`: the `figure-master` agent, which needs MATLAB,
+  plus `pdfimages` / `pdftoppm` for pulling figures out of papers. Its per-project setup is in the
 README under "Setting up figure-master".
 
-### 6. Local clone of the knowledge base
+### 6. Local clone of the knowledge base and paper library
 
-Ask where they keep code. Recommend a folder that is **not** synced by OneDrive or
-Dropbox, because sync tools can corrupt `.git` (e.g. `C:\Users\<you>\code` or `~/code`).
-Then:
+The knowledge base and the paper library are one repo,
+`MonashUniversity-ShockLab/Library_of_Shock_Lab` (formerly `knowledge`; GitHub redirects
+the old name). Ask where they keep code. Recommend a folder that is **not** synced by
+OneDrive or Dropbox, because sync tools can corrupt `.git` (e.g. `C:\Users\<you>\code`
+or `~/code`). Then:
 
 ```
-git -c core.longpaths=true clone https://github.com/MonashUniversity-ShockLab/knowledge.git <parent>/knowledge
+git -c core.longpaths=true clone https://github.com/MonashUniversity-ShockLab/Library_of_Shock_Lab.git <parent>/Library_of_Shock_Lab
 ```
 
-On Windows, also run `git -C <parent>/knowledge config core.longpaths true`.
+On Windows, also run `git -C <parent>/Library_of_Shock_Lab config core.longpaths true`.
 
 Point Claude at the clone by adding this to the same `~/.claude/settings.json`, merged
 in the same way:
@@ -104,11 +112,17 @@ in the same way:
 
 On Windows, use forward slashes or escaped backslashes in the JSON string.
 
-Ask whether they already have paper PDFs (e.g. a personal Obsidian vault). If so, offer to
-copy them into `<parent>/knowledge/attachments/papers/`, which git ignores. Paper notes
-embed PDFs from there, and the files need the `author-year-shorttitle.pdf` names in the
-notes' `pdf:` fields. Papers they don't have show a "not found" placeholder, which is
-expected.
+**Paper PDFs.** The group's PDFs are on the Market drive in `Z:\Library_of_Shock_Lab\papers`
+(with `_Unprocessed`, `_Off_Topic`, `_Deferred` and the topic folders). Offer to copy the
+whole folder's contents into `<parent>/Library_of_Shock_Lab/attachments/papers/`, which git
+ignores (e.g. `robocopy "Z:\Library_of_Shock_Lab\papers" "<clone>\attachments\papers" /E /XC /XN /XO`
+on Windows, which never overwrites a newer local file). Ask first; it is about 1 GB. If
+`Z:` isn't mapped, ask them where Market is mounted. Paper notes embed PDFs from there,
+by the paths in the notes' `pdf:` fields. Papers they don't have show a "not found"
+placeholder, which is expected.
+
+`Misc/` and `research_questions/` in the clone are personal working space for the library
+skills: never committed to the shared repo.
 
 Optional: suggest opening the clone as an Obsidian vault with the Dataview plugin.
 
@@ -122,11 +136,22 @@ Tell them:
   `/plugin` (terminal). Asking something like "write an sbatch script for a 16-core
   MATLAB job on M3" should make Claude consult the knowledge base and use
   `--ntasks=1 --cpus-per-task=16`.
-- Read `onboarding/Getting started.md` and `CLAUDE.md` in the knowledge clone.
+- If they enabled `shocklab-library`: `/lit <question>` answers from the paper library
+  with note and page citations. Skills that change the library (`/add-paper`,
+  `/paper-audit`, `/restructure-note`) work on a branch and open a PR, which the org's
+  PR agent reviews.
+- Read `onboarding/Getting started.md` and `CLAUDE.md` in the library clone.
 
 ## Working on plugins here
 
 - Generalise before committing: no personal paths, and no files that only one person has.
 - On every change, bump `version` in both the plugin's `plugin.json` and its
-  `marketplace.json` entry, so `autoUpdate` picks it up.
-- Validate JSON before pushing.
+  `marketplace.json` entry, so `autoUpdate` picks it up. `shocklab-library` and
+  `shocklab-apps` have no `plugin.json`: their `marketplace.json` entries are the
+  manifest and list their skills and agents from the top-level `skills/` and `agents/`
+  folders (see README, "How the top-level `skills/` and `agents/` become plugins").
+  Bump the entry's `version` when any skill or agent it lists changes.
+- Keep each folder in `skills/` self-contained (its `SKILL.md` plus its own files), so it
+  can be copied on its own into `~/.claude/skills/`. Library skills find the library
+  through `SHOCKLAB_KNOWLEDGE`, never a personal path.
+- Validate JSON before pushing, and run `claude plugin validate .` from the repo root if the CLI is available.

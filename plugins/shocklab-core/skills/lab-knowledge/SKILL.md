@@ -1,13 +1,16 @@
 ---
 name: lab-knowledge
-description: Check the ShockLab knowledge base BEFORE working out anything specific to the lab, Monash or its infrastructure — M3/MASSIVE, Slurm/sbatch/srun requests, Strudel desktops, the Market drive, MATLAB on the cluster, licences, lab rigs, cameras, schlieren/PIV/calibration, SPOD processing, the lab's paper notes. Also use AFTER solving something non-obvious and org-specific, to offer to record it so nobody has to work it out again, and when asked to add a note, paper or method page.
+description: Check the ShockLab knowledge base BEFORE working out anything specific to the lab, Monash or its infrastructure — M3/MASSIVE, Slurm/sbatch/srun requests, Strudel desktops, the Market drive, MATLAB on the cluster, licences, lab rigs, cameras, schlieren/PIV/calibration, SPOD processing, the lab's paper notes and topic pages (for a literature question, use /lit from the shocklab-library plugin if it is installed). Also use AFTER solving something non-obvious and org-specific, to offer to record it so nobody has to work it out again, and when asked to add a note, paper or method page.
 ---
 
 # ShockLab knowledge base
 
-The lab's shared knowledge lives in the private repo `MonashUniversity-ShockLab/knowledge`, an
-Obsidian vault of Markdown notes. Its `CLAUDE.md` is the authority on layout, naming and
-provenance rules — read it before writing anything, and follow it over anything here.
+The lab's shared knowledge lives in the private repo
+`MonashUniversity-ShockLab/Library_of_Shock_Lab` (formerly `knowledge`; GitHub redirects
+the old name), an Obsidian vault of Markdown notes that is also the group's paper library.
+Its `CLAUDE.md` is the authority on layout, naming and provenance rules, and `SCHEMA.md`
+on the paper notes' frontmatter; read them before writing anything, and follow them over
+anything here.
 
 The point of it: **nobody in the lab should have to work out the same org-specific thing
 twice.** So look first, and write back what you learn.
@@ -17,13 +20,15 @@ twice.** So look first, and write back what you learn.
 Check in this order and use the first that exists:
 
 1. The path in the environment variable `SHOCKLAB_KNOWLEDGE`.
-2. A sibling or parent folder named `knowledge` that contains a `CLAUDE.md` whose first line
-   is `# knowledge: conventions`.
+2. `./Library_of_Shock_Lab` in the working directory, or a sibling or parent folder named
+   `Library_of_Shock_Lab` (or `knowledge`, an older clone), that contains `SCHEMA.md` or
+   the vault's `CLAUDE.md`.
 3. Otherwise, read without cloning:
-   `gh api repos/MonashUniversity-ShockLab/knowledge/contents/<path> -H "Accept: application/vnd.github.raw"`
-   and search with `gh search code --repo MonashUniversity-ShockLab/knowledge "<term>"`.
+   `gh api repos/MonashUniversity-ShockLab/Library_of_Shock_Lab/contents/<path> -H "Accept: application/vnd.github.raw"`
+   and search with `gh search code --repo MonashUniversity-ShockLab/Library_of_Shock_Lab "<term>"`.
    If the user wants to write to it, offer to clone it
-   (`gh repo clone MonashUniversity-ShockLab/knowledge`) and suggest they set `SHOCKLAB_KNOWLEDGE`.
+   (`gh repo clone MonashUniversity-ShockLab/Library_of_Shock_Lab`) and suggest they set
+   `SHOCKLAB_KNOWLEDGE`.
 
 With a clone, run `git pull --ff-only` first (skip quietly if it fails, e.g. offline).
 
@@ -35,16 +40,20 @@ Keep this quick — a few seconds, not a research project:
    full page. Most "why is the cluster doing X" questions are answered there.
 2. If not, grep the clone for the key terms (`grep -ril "cpus-per-task" .` or similar)
    and read the hits. Use the "Where to look for what" table in the vault's `CLAUDE.md`
-   to pick folders: `methods/`, `facilities/`, `documentation/`, `papers/`, `topics/`.
+   to pick folders: `methods/`, `facilities/`, `documentation/`, `onboarding/`.
+   For the literature: `INDEX.md` lists every paper and topic page with a one-line
+   scope; `topics/` holds the cross-paper reviews (read `topics/_queue/<topic>.md` too,
+   if present), `paper_notes/` one note per paper, and `data/` numbers collected across
+   papers. For anything more than a quick lookup, use `/lit` (shocklab-library plugin).
 3. If you find it, use it and tell the user which note it came from. Treat anything with
    `type: generated` and an empty `verified:` as unverified, and say so.
 4. If nothing covers it, say that briefly and carry on with the task.
 
 **Paper PDFs.** Each member keeps their own PDFs in `attachments/papers/` in their clone
-(git ignores it). A paper note's `pdf:` field and its `![[...]]` embed point there. If the
+(git ignores it), copied from the Market folder `Z:\Library_of_Shock_Lab\papers`. A paper note's `pdf:` field and its `![[...]]` embed point there. If the
 user asks about a paper and its PDF is present, you can read it. If it's missing, that's
-normal: work from the note, tell the user the PDF isn't in their library, and give them
-the `doi:`/`url:` so they can save it under the `pdf:` filename. Never remove or change an
+normal: work from the note, tell the user the PDF isn't in their copy (suggest re-copying
+from Market), and give them the `doi:`/`url:` so they can save it under the `pdf:` path. Never remove or change an
 embed because the file is missing.
 
 ## 3. Write back what you learn
@@ -70,9 +79,14 @@ preferences, anything project-private.
 
 - Follow the vault's `CLAUDE.md`: templates in `_templates/`, naming rules, frontmatter.
 - Anything you author is Claude-authored: `generated/` or `documentation/`, with the
-  `> [!warning] Claude-authored` callout — **never** in `papers/`.
+  `> [!warning] Claude-authored` callout — **never** in `paper_notes/`, which only the
+  library skills (`/add-paper`, `/paper-audit`, `/restructure-note`) write, following
+  `SCHEMA.md`.
 - Never fill in `verified:` or `verified_by:`.
 - Don't reword notes other people own; add tasks or open questions instead.
 - Never commit PDFs, `.mat`, video or raw data.
 - Show the user the diff and ask before committing or pushing; it's a repo the whole lab
-  shares. Pull, commit small, push.
+  shares. Pull, commit small on a branch, push it and open a PR; the org has a PR agent
+  that reviews PRs against the repo's `CLAUDE.md`.
+- `Misc/` and `research_questions/` in a clone are the member's personal working space;
+  never commit them.

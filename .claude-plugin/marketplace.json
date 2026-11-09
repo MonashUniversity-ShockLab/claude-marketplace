@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Claude Code agents, skills and commands for the ShockLab group",
-    "version": "0.2.1"
+    "version": "0.3.0"
   },
   "plugins": [
     {
       "name": "shocklab-core",
       "source": "./plugins/shocklab-core",
       "description": "Check the ShockLab knowledge base before working out org-specific procedures, and record new findings",
-      "version": "0.2.2",
+      "version": "0.3.0",
       "category": "research"
     },
     {
@@ -21,6 +21,45 @@
       "description": "figure-master agent: makes, restyles, copies and recreates figures for LaTeX reports, theses and papers in ShockLab's MATLAB plotting style",
       "version": "0.1.1",
       "category": "research"
+    },
+    {
+      "name": "shocklab-library",
+      "source": "./",
+      "strict": false,
+      "description": "Paper-library skills for Library_of_Shock_Lab: /lit, /research-question, /add-paper, /paper-audit, /restructure-note, plus the paper-auditor and note-restructurer agents",
+      "version": "0.1.0",
+      "author": {
+        "name": "MonashUniversity-ShockLab"
+      },
+      "repository": "https://github.com/MonashUniversity-ShockLab/claude-marketplace",
+      "category": "research",
+      "skills": [
+        "./skills/lit",
+        "./skills/research-question",
+        "./skills/add-paper",
+        "./skills/paper-audit",
+        "./skills/restructure-note"
+      ],
+      "agents": [
+        "./agents/paper-auditor.md",
+        "./agents/note-restructurer.md"
+      ]
+    },
+    {
+      "name": "shocklab-apps",
+      "source": "./skills",
+      "strict": false,
+      "description": "App feature queue: /queue requests into an app's FEATURE_QUEUE.md, then /enact-queue builds them in one version bump",
+      "version": "0.1.0",
+      "author": {
+        "name": "MonashUniversity-ShockLab"
+      },
+      "repository": "https://github.com/MonashUniversity-ShockLab/claude-marketplace",
+      "category": "development",
+      "skills": [
+        "./queue",
+        "./enact-queue"
+      ]
     }
   ]
 }
