@@ -24,10 +24,11 @@ naming and provenance; read it first and follow it over anything here.
   only that you skipped it.
 - **Ask before writing anywhere shared.** Show the plan and wait for a yes before the pull
   request and before the Market copy.
-- **Members don't edit the paper library.** `paper_notes/`, `topics/`, `data/`, `INDEX.md`
-  and `references.bib` are maintainer-only. Papers go to Market `_Unprocessed` for a
-  maintainer's `/add-paper`; insights about a paper go in the PR description as
-  "Suggested library updates" for a maintainer, never into those folders.
+- **This skill doesn't edit the paper library.** `paper_notes/`, `topics/`, `data/`,
+  `INDEX.md` and `references.bib` change only through `/add-paper` (open to every member)
+  and the other library skills. Papers go to Market `_Unprocessed` first; insights about a
+  paper go in the PR description as "Suggested library updates", never straight into those
+  folders.
 
 ## 0. Prerequisites
 
@@ -129,7 +130,7 @@ Write the approved items there, stage files by name, run
 their yes) commit, push and open a PR titled `Import <name>'s knowledge (<n> items)`. The
 PR description lists each item with its source (file name only, not the full private
 path), the classification, and a final `## Suggested library updates` section for
-paper-library changes a maintainer should consider. The org's PR agent reviews it. Remove
+paper-library changes for whoever processes those papers. The org's PR agent reviews it. Remove
 the worktree afterwards (`git worktree remove`).
 
 ## 5. Papers: copy the ones the group doesn't have to Market
@@ -182,13 +183,21 @@ the worktree afterwards (`git worktree remove`).
    with exclusive create and a size check; it never moves, renames or overwrites anything
    and leaves their originals untouched.
 
-6. Tell them a maintainer will index the papers with `/add-paper`, and that the notes
-   arrive with `git pull`.
+6. **Offer to process them, with the cost up front.** The papers are now queued in
+   `_Unprocessed`, where anyone in the lab can index them with `/add-paper`. Tell the member
+   they can do that themselves, now or later, but that it is token-heavy: each paper is read
+   in full, written up as a long note and worked into the topic pages, so a few papers can
+   use a large share of a session's usage limit. Suggest starting with the handful most
+   relevant to their own work. If they want to go ahead, run `/add-paper` on the ones they
+   pick (in a new session if this one is already long); it ends with a pull request. If
+   not, the papers wait in `_Unprocessed` for whoever processes them next, and their notes
+   reach everyone with `git pull`.
 
 ## 6. Finish
 
 Summarise: locations read; knowledge items proposed / accepted and the PR link; items
 skipped as private (counts only); conflicts raised; papers scanned, duplicates by status,
-copied to `_Unprocessed` (count), and any left out (unreadable, not a paper, refused).
+copied to `_Unprocessed` (count), any left out (unreadable, not a paper, refused), and
+whether they chose to process any with `/add-paper`.
 Offer to re-run later for locations they skipped. Don't record the member's private paths
 in the library or the PR.
