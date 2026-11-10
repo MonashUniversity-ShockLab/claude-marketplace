@@ -73,8 +73,8 @@ Check `~/.claude/settings.json` (`C:\Users\<you>\.claude\settings.json` on Windo
 ```
 
 `shocklab-core` is for everyone. `shocklab-library` (the paper-library skills: `/lit` and
-`/research-question` for everyone; `/add-paper`, `/paper-audit` and `/restructure-note`,
-which change the notes, for maintainers only) is on by default, as in the library's
+`/research-question` and `/add-paper` for everyone; `/paper-audit` and `/restructure-note`,
+which rework older notes, for maintainers only) is on by default, as in the library's
 `onboarding/Getting started.md`; it needs the library clone and `SHOCKLAB_KNOWLEDGE` from
 step 6. Leave it out only if they say they won't read papers.
 
@@ -174,7 +174,7 @@ Ask: **"Where is your current knowledge stored?"** (note folders or vaults, proj
 or Zotero `storage/`). Explain what happens next: Claude pulls out what is useful to the
 whole lab into the library by pull request, and copies their papers that the group doesn't
 already have to Market `_Unprocessed`, renamed to the `Authors_Year_Title.pdf` convention,
-for a maintainer to index. Their own files are only read, never moved or changed, and
+ready for anyone to index with `/add-paper` (token-heavy; it offers this at the end). Their own files are only read, never moved or changed, and
 nothing private is copied.
 
 If they want to do it now, follow `plugins/shocklab-core/skills/import-knowledge/SKILL.md`
@@ -196,9 +196,9 @@ Tell them:
   `--ntasks=1 --cpus-per-task=16`.
 - If they enabled `shocklab-library`: `/lit <question>` answers from the paper library
   with note and page citations. To get a paper added, put its PDF in Market
-  `Library_of_Shock_Lab\papers\_Unprocessed\`; a maintainer processes it with
-  `/add-paper` and pushes the note. Skills that change the library (`/add-paper`,
-  `/paper-audit`, `/restructure-note`) are for maintainers only.
+  `Library_of_Shock_Lab\papers\_Unprocessed\`; anyone can then process it with
+  `/add-paper`, which opens a pull request with the note (it reads each paper in full, so
+  it is token-heavy). `/paper-audit` and `/restructure-note` are for maintainers only.
 - Read `onboarding/Getting started.md` and `CLAUDE.md` in the library clone.
 - If they skipped step 8: `/import-knowledge` brings their existing notes and papers into
   the library whenever they're ready.
