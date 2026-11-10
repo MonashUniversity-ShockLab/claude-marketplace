@@ -1,5 +1,5 @@
 {
-  "description": "Remind Claude to check the ShockLab knowledge base before working out org-specific procedures, and to record new findings",
+  "description": "Remind Claude to check the ShockLab knowledge base and record new findings; ask before a person merges a ShockLab PR the PR agent would merge",
   "hooks": {
     "SessionStart": [
       {
@@ -8,6 +8,18 @@
             "type": "command",
             "command": "cat \"${CLAUDE_PLUGIN_ROOT}/hooks/session-reminder.md\"",
             "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/merge-guard.sh\"",
+            "timeout": 20
           }
         ]
       }

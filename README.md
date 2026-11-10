@@ -79,7 +79,7 @@ clone). Paste:
 
 ### How `shocklab-core` avoids duplicated work
 
-1. **Look first.** A `SessionStart` hook adds a three-line reminder
+1. **Look first.** A `SessionStart` hook adds a short reminder
    (`plugins/shocklab-core/hooks/session-reminder.md`) to every session, so Claude reaches
    for the `lab-knowledge` skill before working out org-specific procedures, not only when
    the question happens to match the skill's description. The skill starts with
@@ -87,6 +87,13 @@ clone). Paste:
 2. **Write back.** When Claude solves something non-obvious and org-specific, it offers,
    after your task, to add it to the knowledge base. You see the diff before anything
    is committed.
+
+3. **Let the PR agent merge.** A `PreToolUse` hook (`plugins/shocklab-core/hooks/merge-guard.sh`)
+   catches `gh pr merge` on a MonashUniversity-ShockLab repo and asks you first, showing the
+   PR's title, branches and changed files: the PR agent normally merges, but you may still
+   merge yourself. If only part should go in, decline and have Claude split those files into
+   their own PR. It never blocks, and stays silent for other orgs. Merges in the GitHub web
+   page aren't caught; the guideline still applies.
 
 Change the reminder's wording in `session-reminder.md` and bump the version; everyone
 gets it on their next `/plugin marketplace update shocklab`.

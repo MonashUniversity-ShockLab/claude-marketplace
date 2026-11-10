@@ -88,6 +88,13 @@ preferences, anything project-private.
 - Show the user the diff and ask before committing or pushing; it's a repo the whole lab
   shares. Pull, commit small on a branch, push it and open a PR; the org has a PR agent
   that reviews PRs against the repo's `CLAUDE.md`.
+- **Leave merging to the PR agent.** It reviews and merges PRs hourly on weekdays, so don't
+  merge into `main` yourself or suggest the user does. If they ask to, first show what the
+  merge brings in (`gh pr view <n> --json files,additions,deletions`), and offer to merge only
+  part (e.g. just one `.md`) by moving those files into their own PR. If they still want to
+  merge, that's allowed: do it. (The plugin's merge-guard hook also asks them before any
+  `gh pr merge` on an org repo.) Maintainers' direct pushes of library changes, as the
+  library's `CLAUDE.md` allows, are unaffected.
 - `Misc/` in a clone is the member's personal working space; never commit it.
   `research_questions/` is shared: any member may add one (with `/research-question`, on a
   branch with a PR); don't edit another member's question without asking them.
