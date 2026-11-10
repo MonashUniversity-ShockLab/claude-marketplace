@@ -64,6 +64,7 @@ Pick the folder from what the document *is*, using the library's layout:
 | A rig, nozzle, camera or sensor: specs, settings, quirks | `facilities/` | human-owned, as above |
 | A summary of one of the group's code repos | `codebase_notes/` | Claude-authored |
 | Something every new member needs first | `onboarding/` | human-owned, as above |
+| An app (player, viewer, exporter) other members should install | not this skill: `/publish-app` gives it an org repo, releases and its `applets/` card | |
 | One-line org facts it turned up | also a dated line each in `documentation/Org Gotchas.md`, linking to the new page | |
 
 Human-owned folders hold documents a person maintains: put one there only if the user will
