@@ -112,7 +112,7 @@ Then check the context budget before starting the next wave.
 - Unless `--no-topics`: revise the topic pages `library.py check` lists as due (10+ contributions or oldest over 3 weeks) or under "Major corrections queued" (section 3 step 6), once each, one `high` subagent per page (add-paper §3 step 3; it treats `## audit:` sections like paper contributions, except that the Papers line already exists and only its role text may change). Commit each page with its queue file as it finishes.
 - If `notes_to_update.md` lists 10 or more notes, apply them as add-paper §3 step 3a.
 - **Push.** Show the user `git -C <library> log --stat @{u}..HEAD` and ask before pushing. Then `git -C <library> pull --rebase` and push. If the maintainer chose a branch, push it and open a PR to `MonashUniversity-ShockLab/Library_of_Shock_Lab` instead (`gh pr create`, with the report below as the body). For the weekly sync, stop at the commit.
-- If an audit renamed a PDF, offer to copy the renamed file to the same relative path under the Market folder `Z:\Library_of_Shock_Lab\papers\` (`cp -n`; never overwrite or delete there), so other members' copies match the note's `pdf` field.
+- If an audit renamed a PDF, offer to copy the renamed file to the same relative path under the Market folder `Library_of_Shock_Lab\papers\` (find its drive as in add-paper §0a; if Market isn't mounted, say so and list the files instead) (`cp -n`; never overwrite or delete there), so other members' copies match the note's `pdf` field.
 
 ## 5. Report
 

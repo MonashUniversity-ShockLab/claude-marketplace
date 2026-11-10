@@ -50,7 +50,7 @@ Keep this quick — a few seconds, not a research project:
 4. If nothing covers it, say that briefly and carry on with the task.
 
 **Paper PDFs.** Each member keeps their own PDFs in `attachments/papers/` in their clone
-(git ignores it), copied from the Market folder `Z:\Library_of_Shock_Lab\papers`. A paper note's `pdf:` field and its `![[...]]` embed point there. If the
+(git ignores it), copied from the Market folder `Library_of_Shock_Lab\papers`. Market's drive letter differs between PCs (`Z:` on some, `Y:` on others), so never assume one: use `SHOCKLAB_MARKET_PAPERS` if set, else look for `Library_of_Shock_Lab\papers` on every mounted drive (PowerShell: `Get-PSDrive -PSProvider FileSystem | ForEach-Object { Join-Path $_.Root 'Library_of_Shock_Lab\papers' } | Where-Object { Test-Path $_ }`). If no mounted drive has it, tell the user Market isn't mounted on this machine and ask them to connect it or say where it is; never guess a path. If several do, ask which. A paper note's `pdf:` field and its `![[...]]` embed point there. If the
 user asks about a paper and its PDF is present, you can read it. If it's missing, that's
 normal: work from the note, tell the user the PDF isn't in their copy (suggest re-copying
 from Market), and give them the `doi:`/`url:` so they can save it under the `pdf:` path. Never remove or change an
