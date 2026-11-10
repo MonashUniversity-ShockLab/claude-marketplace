@@ -116,15 +116,24 @@ in the same way:
 
 On Windows, use forward slashes or escaped backslashes in the JSON string.
 
-**Paper PDFs.** The group's PDFs are on the Market drive in `Z:\Library_of_Shock_Lab\papers`
-(with `_Unprocessed`, `_Off_Topic`, `_Deferred` and the topic folders). Offer to copy the
+**Paper PDFs.** The group's PDFs are on the Market drive in `Library_of_Shock_Lab\papers`
+(with `_Unprocessed`, `_Off_Topic`, `_Deferred` and the topic folders). Market's drive
+letter differs between PCs (`Z:` on some, `Y:` on others), so find it rather than assume
+one: use `SHOCKLAB_MARKET_PAPERS` if set, else check every mounted drive for a
+`Library_of_Shock_Lab\papers` folder (PowerShell:
+`Get-PSDrive -PSProvider FileSystem | ForEach-Object { Join-Path $_.Root 'Library_of_Shock_Lab\papers' } | Where-Object { Test-Path $_ }`;
+on macOS/Linux, the mount points under `/Volumes`, `/mnt` and `/media/$USER`). One match:
+use it and tell them which drive it is. Several: ask which. **None: flag it.** Tell them
+Market isn't mounted on this machine and ask them to connect it or say where it is; never
+guess a path, and skip the copy if they can't. Once found, offer to add
+`SHOCKLAB_MARKET_PAPERS` (that folder, forward slashes) to the same `env` block, so the
+library skills don't have to search again. Offer to copy the
 whole folder's contents into `<parent>/Library_of_Shock_Lab/attachments/papers/`, which git
-ignores (e.g. `robocopy "Z:\Library_of_Shock_Lab\papers" "<clone>\attachments\papers" /E /XC /XN /XO`
-on Windows, or `rsync -a --ignore-existing "<market>/Library_of_Shock_Lab/papers/" "<clone>/attachments/papers/"`
+ignores (e.g. `robocopy "<M>:\Library_of_Shock_Lab\papers" "<clone>\attachments\papers" /E /XC /XN /XO`
+on Windows, with `<M>` the drive found, or `rsync -a --ignore-existing "<market>/Library_of_Shock_Lab/papers/" "<clone>/attachments/papers/"`
 on macOS/Linux; both copy only files they don't have yet and never overwrite one already in
 the clone). Ask first; it is about 1 GB the first time. Tell them to re-run the same
-command after every `git pull` to get PDFs for new notes. If
-`Z:` isn't mapped, ask them where Market is mounted. Paper notes embed PDFs from there,
+command after every `git pull` to get PDFs for new notes. Paper notes embed PDFs from there,
 by the paths in the notes' `pdf:` fields. Papers they don't have show a "not found"
 placeholder, which is expected.
 
@@ -153,7 +162,7 @@ Tell them:
   `--ntasks=1 --cpus-per-task=16`.
 - If they enabled `shocklab-library`: `/lit <question>` answers from the paper library
   with note and page citations. To get a paper added, put its PDF in Market
-  `Z:\Library_of_Shock_Lab\papers\_Unprocessed\`; a maintainer processes it with
+  `Library_of_Shock_Lab\papers\_Unprocessed\`; a maintainer processes it with
   `/add-paper` and pushes the note. Skills that change the library (`/add-paper`,
   `/paper-audit`, `/restructure-note`) are for maintainers only.
 - Read `onboarding/Getting started.md` and `CLAUDE.md` in the library clone.

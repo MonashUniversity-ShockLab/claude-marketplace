@@ -6,7 +6,7 @@ argument-hint: "[optional: a folder to scan, or specific PDF file(s) to (re)inde
 
 # Index new papers
 
-**Maintainers only.** A maintainer is someone with push access to the shared library repo who says so, or whose own `CLAUDE.md` says so. If the user is not a maintainer, don't run this skill: tell them to put the PDF in the Market folder `Z:\Library_of_Shock_Lab\papers\_Unprocessed\`, where a maintainer will process it, and stop. If it isn't clear, ask once.
+**Maintainers only.** A maintainer is someone with push access to the shared library repo who says so, or whose own `CLAUDE.md` says so. If the user is not a maintainer, don't run this skill: tell them to put the PDF in the Market folder `Library_of_Shock_Lab\papers\_Unprocessed\`, where a maintainer will process it, and stop. If it isn't clear, ask once.
 
 Goal: read each PDF **once**, carefully, and capture everything a later session would need, so the PDF only has to be reopened for exact wording or figures. Then fold the paper into the library's synthesis (topic pages, data tables), so the library keeps getting more useful rather than just longer.
 
@@ -22,7 +22,7 @@ If none of these exists, stop and tell the user to clone the library and set `SH
 
 The helper scripts need only standard Python 3: run them as `python <library>/tools/library.py <command>`. If `python` is not on PATH, try `python3` or `py -3`, or the `python` of any conda env; ask the user once if none works.
 
-The library layout, frontmatter fields, controlled vocabulary and topic-page structure are in `<library>/SCHEMA.md`. Read it first. Below, `library.py` means `python <library>/tools/library.py`. The PDFs live in `<library>/attachments/papers/` (git-ignored), whose layout matches the group's Market folder `Z:\Library_of_Shock_Lab\papers` exactly: topic folders plus `_Unprocessed/`, `_Off_Topic/` and `_Deferred/`. Students' paper requests arrive in Market `_Unprocessed/`.
+The library layout, frontmatter fields, controlled vocabulary and topic-page structure are in `<library>/SCHEMA.md`. Read it first. Below, `library.py` means `python <library>/tools/library.py`. The PDFs live in `<library>/attachments/papers/` (git-ignored), whose layout matches the group's Market folder `Library_of_Shock_Lab\papers` exactly: topic folders plus `_Unprocessed/`, `_Off_Topic/` and `_Deferred/`. Students' paper requests arrive in Market `_Unprocessed/`.
 
 **Pull first.** Before writing anything, pull (`git -C <library> pull --ff-only`). Commit on the current branch (normally `main`) and push at the end. If the maintainer prefers a pull request, create a branch now (e.g. `add-paper/YYYY-MM-DD-<short>`) and put all the commits below on it. A maintainer who works in their own repo and reaches the shared repo through a weekly sync just commits there.
 
@@ -52,7 +52,7 @@ Before anything else, look in `<library>/paper_notes/_incoming/`:
 
 ## 0a. Fetch requests from Market
 
-**Where Market is.** `<market>` below is the group's Market papers folder: the path in the environment variable `SHOCKLAB_MARKET_PAPERS` if set, else a path the user gives, else `Z:\Library_of_Shock_Lab\papers` (the usual Windows mapping; `/z/Library_of_Shock_Lab/papers` in Git Bash). If none of these is reachable (e.g. a cloud sandbox, or a Linux machine without the share mounted), say so and skip this step and the final Market step; the final report then lists the PDFs a maintainer must file on Market by hand. Use whichever shell is available (PowerShell or POSIX); the steps below say what to do, not which command.
+**Where Market is.** `<market>` below is the group's Market papers folder: the path in the environment variable `SHOCKLAB_MARKET_PAPERS` if set, else a path the user gives, else the `Library_of_Shock_Lab\papers` folder on whichever mounted drive has it. Market's drive letter differs between PCs (`Z:` on some, `Y:` on others), so search rather than assume: in PowerShell `Get-PSDrive -PSProvider FileSystem | ForEach-Object { Join-Path $_.Root 'Library_of_Shock_Lab\papers' } | Where-Object { Test-Path $_ }`; in Git Bash check `/<letter>/Library_of_Shock_Lab/papers` for each drive letter; on macOS/Linux, the mount points under `/Volumes`, `/mnt` and `/media/$USER`. One match: use it and tell the user which drive it is. Several: ask which. If none is found (Market not mounted, a cloud sandbox, a Linux machine without the share), flag it clearly to the user, never guess a path, and skip this step and the final Market step; the final report then lists the PDFs a maintainer must file on Market by hand. Use whichever shell is available (PowerShell or POSIX); the steps below say what to do, not which command.
 
 Unless `$ARGUMENTS` names a folder or files, list the PDFs in `<market>/_Unprocessed/`. If any are not already in `<library>/attachments/papers/_Unprocessed/`, offer to copy them there. **Copy, don't move**, and don't overwrite local files: the Market originals stay until the final step. Skip this if the user declines.
 
