@@ -100,6 +100,11 @@ How to use them:
 - **Library notes on the code:** `codebase_notes/` in the library summarises some repos
   (e.g. `schlieren-processing-scripts.md`). It records the commit it describes; if the
   repo has moved on, re-check the files you rely on.
+- **Apps** (players, viewers, exporters such as FieldsPlayer) are separate: each has its own
+  org repo with builds on its Releases page, and a card in the library's `applets/`
+  (`_Applets.md` lists them) with install steps, what it reads, and its command line for
+  scripts and agents. Check there before building a new viewer or exporter. To publish a
+  new one, or release a new version, use `/publish-app`.
 - **Changes** go by pull request to that repo, like everything else in the org. Don't edit
   a member's local copy of these scripts unless they ask; many people keep modified copies
   inside their own project repos, which are theirs.
