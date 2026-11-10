@@ -191,7 +191,67 @@ put the public key on M3 (§2; Route A asks for their M3 password once, which **
 in their own terminal, never in chat), add the `~/.ssh/config` entry (§3) and test with
 `ssh <host> "hostname; whoami"`. Never copy a private key anywhere or print it.
 
-### 8. Bring in what they already know
+### 8. Their own project folder in git
+
+Most members never put their own work under version control because they don't know git,
+and a deleted script or a broken edit is then gone for good. Offer to do it with them; you
+drive it, they approve each step and don't need to know any git commands. If they say no,
+skip it and mention in the summary that they can ask any time ("put my project folder in
+git").
+
+Ask: **"Where is the main folder for your own work?"** (the scripts, code and notes for their
+PhD or project, e.g. `OneDrive\PhD\Projects`; one folder that holds their projects is fine).
+Then check, read-only:
+
+- already a git repo (`git -C <folder> rev-parse --show-toplevel`)? If so, check it has a
+  GitHub remote (`git remote -v`), nothing large is committed, and recent work is pushed
+  (`git status -sb`). Offer only what is missing, e.g. just the GitHub step below. If the
+  folder sits *inside* a bigger repo, or holds several repos, say so and ask what they want.
+- not a repo: explain in two or three plain sentences what they get: every saved version of
+  every script (undo for code), a private backup on GitHub, and an easy way to get the same
+  code onto M3 or another computer. Then, on their yes:
+
+1. **Look before touching anything.** Summarise the folder: file count and total size by
+   type, the largest files, and anything that must not go into git:
+   - data and results (`.mat`, `.h5`, `.tdms`, `.mraw`, `.cine`, videos, raw images, big
+     `.csv`), PDFs of papers, build and environment folders (`.venv/`, `node_modules/`,
+     `__pycache__/`, `dist/`), editor and OS clutter (`*.asv`, `*.m~`, `.DS_Store`,
+     `Thumbs.db`);
+   - **secrets**: `.env` files, API keys, tokens, passwords, private SSH keys, anything named
+     `*secret*`, `*token*`, `*credentials*`. Never print their contents; list the file names.
+   - third-party code bundled in (e.g. `export_fig`, `ffmpeg`): fine to keep if small, but
+     binaries over 50 MB must be ignored (GitHub refuses files over 100 MB).
+2. **Write a `.gitignore`** at the folder's root from what you found, with a comment per
+   group, and show it. Code, notes, small configs and their own `README`s go in; data,
+   outputs, papers and secrets stay out (they stay on their disk, Market or M3, untouched).
+3. **Show what would be committed**: count, total size and the 20 largest files after the
+   `.gitignore` (`git init -b main` then `git status --porcelain --ignored`, or
+   `git add --dry-run .`). Nothing over 50 MB, and keep the total well under 1 GB. Adjust the
+   `.gitignore` until they're happy; nothing is committed yet.
+4. **Identity**: if `git config --global user.name` or `user.email` is empty, ask what to use
+   (their name, and their Monash email or their GitHub no-reply address) and set them.
+5. **First commit**: `git add .` (safe now that the `.gitignore` is agreed, and checked again
+   with `git status`), then `git commit -m "Initial commit of <folder name>"`.
+6. **Private backup on GitHub**: create a **private** repo under their own GitHub account
+   (not the org; their supervisor can be added as a collaborator if they want) and push:
+   `gh repo create <name> --private --source <folder> --push`. Suggest a short name from the
+   folder. Show them the link.
+7. **How to use it from now on**, in three lines: they never need to type git commands;
+   just ask Claude "commit my changes" at the end of a session, "what did I change this
+   week?", or "get back yesterday's version of <file>". If they use M3, the library's
+   `documentation/M3 Guide.md` §4 shows how to clone the repo there and `git pull` after
+   each change (edit on the laptop, not on M3).
+
+If the folder is in OneDrive, that's fine: git and OneDrive work together. Avoid committing
+from two computers at once in the same synced folder; use GitHub to move work between
+machines instead.
+
+Offer, too, a short `CLAUDE.md` at the folder's root describing their projects (what each
+folder is, how the data flows, where data lives), so Claude starts every session knowing
+their work: draft it from what you saw in step 1 and let them edit it. It goes in the
+first commit, or a second one.
+
+### 9. Bring in what they already know
 
 Ask: **"Where is your current knowledge stored?"** (note folders or vaults, project
 `CLAUDE.md`s and READMEs, Claude memory, HPC notes, paper folders such as `Literature/`
@@ -208,7 +268,7 @@ the plugin's `/import-knowledge` only loads in a new session). It needs step 6 d
 Market mounted for the papers part. If they'd rather wait, tell them to run
 `/import-knowledge` in a new session whenever they like. Either way, don't skip asking.
 
-### 9. Finish
+### 10. Finish
 
 Tell them:
 
@@ -224,7 +284,7 @@ Tell them:
   `/add-paper`, which opens a pull request with the note (it reads each paper in full, so
   it is token-heavy). `/paper-audit` and `/restructure-note` are for maintainers only.
 - Read `onboarding/Getting started.md` and `CLAUDE.md` in the library clone.
-- If they skipped step 8: `/import-knowledge` brings their existing notes and papers into
+- If they skipped step 9: `/import-knowledge` brings their existing notes and papers into
   the library whenever they're ready.
 
 ## Working on plugins here
