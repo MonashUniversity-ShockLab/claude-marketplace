@@ -150,7 +150,24 @@ question file and its README row; never someone else's question without asking t
 
 Optional: suggest opening the clone as an Obsidian vault with the Dataview plugin.
 
-### 7. Bring in what they already know
+### 7. M3, if they will use it
+
+Ask whether they will run jobs on M3 (MASSIVE). If not, skip. If so, follow the library's
+`documentation/M3 Guide.md` §0–§3 with them. Two things only they can do, so check first
+and pause until they're done:
+
+- **M3 account and password**: set at <https://password-hpc.erc.monash.edu> (Login with AAF,
+  normal Monash login). Without an account, tell them to request one through the M3
+  documentation's account page and come back.
+- **M3 project**: their project leader adds them. Ask who that is if they don't know;
+  check later with `user_info` or `groups` on M3.
+
+Then, with their approval: make the SSH key on their machine (guide §1, no passphrase),
+put the public key on M3 (§2; Route A asks for their M3 password once, which **they type**
+in their own terminal, never in chat), add the `~/.ssh/config` entry (§3) and test with
+`ssh <host> "hostname; whoami"`. Never copy a private key anywhere or print it.
+
+### 8. Bring in what they already know
 
 Ask: **"Where is your current knowledge stored?"** (note folders or vaults, project
 `CLAUDE.md`s and READMEs, Claude memory, HPC notes, paper folders such as `Literature/`
@@ -167,7 +184,7 @@ the plugin's `/import-knowledge` only loads in a new session). It needs step 6 d
 Market mounted for the papers part. If they'd rather wait, tell them to run
 `/import-knowledge` in a new session whenever they like. Either way, don't skip asking.
 
-### 8. Finish
+### 9. Finish
 
 Tell them:
 
@@ -183,7 +200,7 @@ Tell them:
   `/add-paper` and pushes the note. Skills that change the library (`/add-paper`,
   `/paper-audit`, `/restructure-note`) are for maintainers only.
 - Read `onboarding/Getting started.md` and `CLAUDE.md` in the library clone.
-- If they skipped step 7: `/import-knowledge` brings their existing notes and papers into
+- If they skipped step 8: `/import-knowledge` brings their existing notes and papers into
   the library whenever they're ready.
 
 ## Working on plugins here
