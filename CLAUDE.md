@@ -73,8 +73,8 @@ Check `~/.claude/settings.json` (`C:\Users\<you>\.claude\settings.json` on Windo
 ```
 
 `shocklab-core` is for everyone. `shocklab-library` (the paper-library skills: `/lit` and
-`/research-question` and `/add-paper` for everyone; `/paper-audit` and `/restructure-note`,
-which rework older notes, for maintainers only) is on by default, as in the library's
+`/research-question`, `/add-paper` and `/paper-audit` for everyone; `/restructure-note`,
+which reshapes audited notes, for maintainers only) is on by default, as in the library's
 `onboarding/Getting started.md`; it needs the library clone and `SHOCKLAB_KNOWLEDGE` from
 step 6. Leave it out only if they say they won't read papers.
 
@@ -282,7 +282,8 @@ Tell them:
   with note and page citations. To get a paper added, put its PDF in Market
   `Library_of_Shock_Lab\papers\_Unprocessed\`; anyone can then process it with
   `/add-paper`, which opens a pull request with the note (it reads each paper in full, so
-  it is token-heavy). `/paper-audit` and `/restructure-note` are for maintainers only.
+  it is token-heavy). Anyone can also audit an older note with `/paper-audit` (also by pull
+  request, after claiming the note). `/restructure-note` is for maintainers only.
 - Read `onboarding/Getting started.md` and `CLAUDE.md` in the library clone.
 - If they skipped step 9: `/import-knowledge` brings their existing notes and papers into
   the library whenever they're ready.

@@ -26,8 +26,8 @@
       "name": "shocklab-library",
       "source": "./",
       "strict": false,
-      "description": "Paper-library skills for Library_of_Shock_Lab: /lit, /research-question and /add-paper for everyone; /paper-audit, /restructure-note (plus the paper-auditor and note-restructurer agents) for maintainers",
-      "version": "0.3.1",
+      "description": "Paper-library skills for Library_of_Shock_Lab: /lit, /research-question, /add-paper and /paper-audit (plus the paper-auditor agent) for everyone; /restructure-note (plus the note-restructurer agent) for maintainers",
+      "version": "0.4.0",
       "author": {
         "name": "MonashUniversity-ShockLab"
       },

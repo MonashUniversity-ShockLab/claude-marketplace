@@ -57,7 +57,7 @@ From `$ARGUMENTS`:
 ## 1. Gates
 
 1. **Leftover drafts.** For each `_restructure/<key>.md` from a cut-off run: if its `<key>.result.md` exists, check and fold it (section 3); otherwise delete the draft and put the note first in this run's batch (a restructure is cheap to redo, unlike an audit).
-2. **Skip** any note that is in `paper_notes/_audit/` or `paper_notes/_incoming/` (an audit or add-paper run is working on it), has uncommitted changes (`git status --short -- <note>`), or is named in `<personal>/Misc/notes_to_update.md` with items still open (the restructure would compete with that edit; let `/paper-audit`'s section 4 apply them first). Say which were skipped.
+2. **Skip** any note that is in `paper_notes/_audit/` or `paper_notes/_incoming/` (an audit or add-paper run is working on it), has uncommitted changes (`git status --short -- <note>`), or is named in `<library>/paper_notes/_queue/notes_to_update.md` with items still open (the restructure would compete with that edit; let `/paper-audit`'s section 4 apply them first). Say which were skipped.
 3. Never touch PDFs, topic pages, data tables, `notes_to_update.md`, `notes_to_check.md` or the audit ledger. This lets this skill run beside `/paper-audit` and `/add-paper` without their files colliding.
 
 ## 2. Launch restructurers
@@ -75,7 +75,7 @@ For each note:
 2. The page-ref occurrence count may fall only where repetition was cut. If it fell by more than about a third, or the note shrank by more than 45%, read `git diff --no-index --word-diff=color` around a few cuts before accepting.
 3. If the live note's `git hash-object` changed since launch, discard the draft and leave the note for the next run.
 4. `mv -f <library>/paper_notes/_restructure/<key>.md <library>/paper_notes/<key>.md`.
-5. Append the result file's possible errors to `<personal>/Misc/restructure_flags.md` under `## <key> (YYYY-MM-DD)` (skip if that heading exists). Create the file with a one-line header if missing: "Possible errors noticed while restructuring notes (not checked against the PDF). Fold into notes_to_check.md or the next audit."
+5. Append the result file's possible errors to `<personal>/Misc/restructure_flags.md` under `## <key> (YYYY-MM-DD)` (skip if that heading exists). Create the file with a one-line header if missing: "Possible errors noticed while restructuring notes (not checked against the PDF). Fold into `<library>/paper_notes/_queue/notes_to_check.md` or the next audit."
 6. Append a ledger row to `<personal>/Misc/restructure_ledger.tsv`, creating it with this header if missing: `key	restructured	words_before	words_after	pages	target	still_over	moved_to_own_analysis	note` (tab-separated; `still_over` yes/no; `note` one short line, e.g. the reason it is over target).
 7. Delete `<key>.result.md`.
 
