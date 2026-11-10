@@ -133,9 +133,9 @@ non-obvious and org-specific, offer to record it there once my task is done.
    `pdfinfo` (Poppler, MiKTeX or TeX Live) are needed by `/add-paper` and `/paper-audit`.
 
 `Misc/` (ledgers such as `paper_audit.tsv`, `restructure_ledger.tsv`, `Papers_to_get.md`)
-is personal and lives in a folder outside the clone: the path in
-`SHOCKLAB_PERSONAL` if set, else `My_Knowledgebase/` next to the clone (`../My_Knowledgebase`)
-if it exists, else the clone itself (where it is git-ignored). Research questions are
+is personal and by default lives inside the clone, where it is git-ignored (or in the path
+in `SHOCKLAB_PERSONAL`, or a `My_Knowledgebase/` folder next to the clone, for anyone who
+already has one; no need to create either). Research questions are
 shared, in the clone's `research_questions/`: any member may add one with
 `/research-question` and a PR. The skills and
 `tools/library.py` find it the same way and create what they need there; nothing in it is

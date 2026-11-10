@@ -93,6 +93,31 @@ Then offer the optional plugins listed in `README.md`, and add the ones they wan
   plus `pdfimages` / `pdftoppm` for pulling figures out of papers. Its per-project setup is in the
 README under "Setting up figure-master".
 
+**Then retire personal copies the plugins replace.** Members often have earlier copies of
+these skills, passed around before the marketplace existed. A personal copy doesn't update,
+and it shows up alongside the plugin's (e.g. `/add-paper` next to
+`/shocklab-library:add-paper`), so Claude may run the stale one. Look, read-only, in
+`~/.claude/skills/*/SKILL.md`, `~/.claude/agents/*.md` and `~/.claude/commands/*.md`, and in
+the `.claude/` folder of the project they work in, for:
+
+- the same name as a plugin skill or agent: `add-paper`, `lit`, `research-question`,
+  `paper-audit`, `restructure-note`, `import-knowledge`, `lab-knowledge`, `queue`,
+  `enact-queue`, `paper-auditor`, `note-restructurer`, `figure-master` (list the plugins' current
+  ones with `gh api repos/MonashUniversity-ShockLab/claude-marketplace/contents/skills` and
+  `.../contents/plugins/<plugin>/skills`, in case this list is out of date);
+- a different name but the same job, judged from its description (e.g. a `paper-index` or
+  `literature` skill that writes notes into the library);
+- in `~/.claude/CLAUDE.md`, a block telling Claude to check the ShockLab knowledge base (the
+  manual snippet from this repo's README): the `shocklab-core` plugin now does that.
+
+Show what you found: each item, its path, which plugin skill replaces it, and whether it
+differs from the plugin version (e.g. their own edits). Recommend retiring each one, and on
+their yes **move** it (don't delete) to `~/.claude/_retired_shocklab/<YYYY-MM-DD>/`, keeping
+its folder name, so it can be restored; for the `CLAUDE.md` block, show the lines and remove
+only those. Leave anything they want to keep, and tell them two versions will then show
+up. If their copy has improvements the plugin lacks, suggest offering them to the lab as a
+pull request to this repo. Changes take effect in their next session.
+
 ### 6. Local clone of the knowledge base and paper library
 
 The knowledge base and the paper library are one repo,
@@ -137,11 +162,10 @@ command after every `git pull` to get PDFs for new notes. Paper notes embed PDFs
 by the paths in the notes' `pdf:` fields. Papers they don't have show a "not found"
 placeholder, which is expected.
 
-`Misc/` is personal working space for the library skills, kept in the member's personal
-folder (`SHOCKLAB_PERSONAL`, else `../My_Knowledgebase` next to the clone if it exists, else
-the clone itself, where it is git-ignored): never committed to the shared repo. Offer to
-create an empty `My_Knowledgebase` folder next to the clone (or to set `SHOCKLAB_PERSONAL`
-in the same `env` block). Project-specific paper relevance also goes there, in
+`Misc/` is personal working space for the library skills. Don't create a separate folder
+for it: by default the skills keep it inside the clone, where `Misc/` is git-ignored and
+never committed (anyone who already has `SHOCKLAB_PERSONAL` set or a `My_Knowledgebase`
+folder next to the clone keeps using that). Project-specific paper relevance also goes there, in
 `Project_Paper_Relevance/`: since 2026-11-09 the notes' "Relevance to this project"
 sections cover only the group's research threads. Research
 questions are shared: `/research-question` saves them in the clone's `research_questions/`
