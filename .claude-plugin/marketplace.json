@@ -12,7 +12,7 @@
       "name": "shocklab-core",
       "source": "./plugins/shocklab-core",
       "description": "Check the ShockLab knowledge base before working out org-specific procedures, and record new findings",
-      "version": "0.4.0",
+      "version": "0.5.0",
       "category": "research"
     },
     {
