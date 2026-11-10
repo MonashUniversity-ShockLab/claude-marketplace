@@ -1,6 +1,6 @@
 ---
 name: lab-knowledge
-description: Check the ShockLab knowledge base BEFORE working out anything specific to the lab, Monash or its infrastructure — M3/MASSIVE, Slurm/sbatch/srun requests, Strudel desktops, the Market drive, MATLAB on the cluster, licences, lab rigs, cameras, schlieren/PIV/calibration, SPOD processing, the lab's paper notes and topic pages (for a literature question, use /lit from the shocklab-library plugin if it is installed). Also use AFTER solving something non-obvious and org-specific, to offer to record it so nobody has to work it out again, and when asked to add a note, paper or method page.
+description: Check the ShockLab knowledge base BEFORE working out anything specific to the lab, Monash or its infrastructure — M3/MASSIVE, Slurm/sbatch/srun requests, Strudel desktops, the Market drive, MATLAB on the cluster, licences, lab rigs, cameras, schlieren/PIV/calibration, SPOD processing, the lab's standard analysis code (schlieren, acoustics, PIV and LES processing repos, schlieren tutorial), the lab's paper notes and topic pages (for a literature question, use /lit from the shocklab-library plugin if it is installed). Also use AFTER solving something non-obvious and org-specific, to offer to record it so nobody has to work it out again, and when asked to add a note, paper or method page.
 ---
 
 # ShockLab knowledge base
@@ -75,7 +75,38 @@ to do it.
 Not worth recording: things in the public docs that worked first time, personal
 preferences, anything project-private.
 
-## 4. Rules for any write
+## 4. The lab's code repos
+
+The org also holds the group's standard analysis code. Before writing new processing code
+for schlieren, acoustic, PIV or LES data, or before debugging someone's copy of these
+scripts, check the matching repo: the lab's conventions (array layouts, units, Strouhal
+and wavenumber definitions, file naming) live there.
+
+| Repo | What it is | Read first |
+|---|---|---|
+| `Schlieren_Processing_Scripts` | Standard MATLAB toolbox for time-resolved schlieren of jets: load `.mraw`/`.slow` to `_Fields.mat`, then SPOD, POD, BMD, instantaneous frequency, twin-jet coupling, wavenumber and time–frequency analyses, figures and videos. v2.0; projects started earlier can stay on tag `v1.0` | `README.md` (pipeline), `CONVENTIONS.md`, `Archive/README.md` (what replaced each retired script) |
+| `Schlieren_Tutorial` | Step-by-step tutorial for the schlieren scripts (v2.0+): load to `.mat` → SPOD → plots, with answers in `Finished_Scripts/Run_Tutorial.m`. Default branch `master` | `Tutorial_Guide.md` |
+| `Acoustics_Processing_Scripts` | Microphone-array acoustics from `.tdms`: calibration, `Raw_tdms_to_mat`, processing (Nfft etc.), plots, SPOD and time–frequency analyses. `Raw_tdms_to_mat.m` doesn't work on Linux (M3) before MATLAB R2026a; run it locally | `README.md` (steps 1–5) |
+| `PIV_Processing_Scripts` | Standard PIV processing (PIVlab-based), including stereo 3C reconstruction, pair checking, outlier removal, statistics and POD | `README.md` |
+| `LES_Processing_Scripts` | Processing and analysis of LES data from NRL and UCS: POD, Hilbert-POD, BMD (incl. symmetry-enforced and pseudo-3D), videos, LES–PIV comparison | `README.md` |
+
+How to use them:
+
+- **Read without cloning:** `gh api repos/MonashUniversity-ShockLab/<repo>/contents/<path> -H "Accept: application/vnd.github.raw"`
+  (list a folder by leaving off the header), or `gh search code --repo MonashUniversity-ShockLab/<repo> "<term>"`.
+- **To run them**, the user clones the repo next to their own project, not inside it
+  (`gh repo clone MonashUniversity-ShockLab/<repo>`), and runs the scripts from there,
+  editing the settings block at the top of each script.
+- **Library notes on the code:** `codebase_notes/` in the library summarises some repos
+  (e.g. `schlieren-processing-scripts.md`). It records the commit it describes; if the
+  repo has moved on, re-check the files you rely on.
+- **Changes** go by pull request to that repo, like everything else in the org. Don't edit
+  a member's local copy of these scripts unless they ask; many people keep modified copies
+  inside their own project repos, which are theirs.
+- Other repos may be added to the org later: `gh repo list MonashUniversity-ShockLab`
+  shows the current set.
+
+## 5. Rules for any write
 
 - Follow the vault's `CLAUDE.md`: templates in `_templates/`, naming rules, frontmatter.
 - Anything you author is Claude-authored: `generated/` or `documentation/`, with the
