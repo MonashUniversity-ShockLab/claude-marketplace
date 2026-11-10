@@ -150,7 +150,24 @@ question file and its README row; never someone else's question without asking t
 
 Optional: suggest opening the clone as an Obsidian vault with the Dataview plugin.
 
-### 7. Finish
+### 7. Bring in what they already know
+
+Ask: **"Where is your current knowledge stored?"** (note folders or vaults, project
+`CLAUDE.md`s and READMEs, Claude memory, HPC notes, paper folders such as `Literature/`
+or Zotero `storage/`). Explain what happens next: Claude pulls out what is useful to the
+whole lab into the library by pull request, and copies their papers that the group doesn't
+already have to Market `_Unprocessed`, renamed to the `Authors_Year_Title.pdf` convention,
+for a maintainer to index. Their own files are only read, never moved or changed, and
+nothing private is copied.
+
+If they want to do it now, follow `plugins/shocklab-core/skills/import-knowledge/SKILL.md`
+in this repo (read it with
+`gh api repos/MonashUniversity-ShockLab/claude-marketplace/contents/plugins/shocklab-core/skills/import-knowledge/SKILL.md -H "Accept: application/vnd.github.raw"`;
+the plugin's `/import-knowledge` only loads in a new session). It needs step 6 done, and
+Market mounted for the papers part. If they'd rather wait, tell them to run
+`/import-knowledge` in a new session whenever they like. Either way, don't skip asking.
+
+### 8. Finish
 
 Tell them:
 
@@ -166,6 +183,8 @@ Tell them:
   `/add-paper` and pushes the note. Skills that change the library (`/add-paper`,
   `/paper-audit`, `/restructure-note`) are for maintainers only.
 - Read `onboarding/Getting started.md` and `CLAUDE.md` in the library clone.
+- If they skipped step 7: `/import-knowledge` brings their existing notes and papers into
+  the library whenever they're ready.
 
 ## Working on plugins here
 
