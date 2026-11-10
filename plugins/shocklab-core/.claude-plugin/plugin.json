@@ -1,6 +1,6 @@
 {
   "name": "shocklab-core",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Check the ShockLab knowledge base before working out org-specific procedures, and record new findings",
   "author": {
     "name": "MonashUniversity-ShockLab"
