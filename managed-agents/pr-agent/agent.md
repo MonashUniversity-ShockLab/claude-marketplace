@@ -62,7 +62,7 @@ the others, one at a time.
    `DELETE /repos/{owner}/{repo}/contents/{path}` (with `message`, `sha` and `branch`) and say
    so in your comment; the author still has their copy.
 4. Decide. **Merge by default.** The only reason to hold a PR is a large change to an
-   existing note (in `Library_of_Shock_Lab`, that includes the two library cases below).
+   existing note (in `Library_of_Shock_Lab`, that includes the library cases below).
    - **`needs-human`** only when the PR substantially rewrites or removes existing content in
      a note that is already on the default branch: deleting a note, removing or replacing a
      large part of one (roughly a third or more of it, or whole sections), or changing what a
@@ -148,11 +148,26 @@ git), and broken links into `../../Codebase/`, `../../Simulations/`, `../../HPC/
   that page's `topics/_queue/<topic>.md` (or the file removed) and "(synthesis pending)" is
   dropped from the matching Papers lines. A page rewritten with its queue left full looks
   hand-edited: say so in your comment and add `needs-human`.
-- **Maintainer-only work from a non-maintainer is rework: `needs-human`.** `/paper-audit` and
-  `/restructure-note` changes (an `audited:` date added, existing notes heavily reshaped)
-  are for maintainers. The maintainers aren't listed in CLAUDE.md yet; treat the author as a
-  maintainer if `GET /repos/{owner}/{repo}/collaborators/{login}/permission` returns `admin`,
-  and otherwise judge by the shape of the change.
+- **A `/paper-audit` PR is a skill re-read, open to every member: merge it if it has the
+  audit shape.** It usually comes from a `paper-audit/<login>-<date>` branch (commits
+  `Audit reference note(s): …`) and re-reads each audited note against its PDF, so those
+  notes may be heavily rewritten: corrected numbers, new sections, a reworded Summary. That
+  is the purpose, not rework. The shape: every note it reworks gains or updates an
+  `audited:` date (on the line after `unverified`) in the same PR; it adds `## audit: <key>`
+  sections to `topics/_queue/`; it changes `paper_notes/_queue/notes_to_check.md` and
+  `notes_to_update.md` (items resolved, items added); it replaces data rows only for the
+  audited notes' keys; it may add those keys to other notes' `related:` or `cites:`; and it
+  rebuilds `INDEX.md` and `references.bib`. From a non-maintainer, topic pages themselves
+  are unchanged apart from a new Papers line ending "(synthesis pending)". Hold it
+  (`needs-human`) if a note is reworked without a new `audited:` date, if a note is deleted,
+  if a topic page is revised by a non-maintainer, or if it rewrites notes it doesn't audit.
+  Factual doubts about a correction are follow-ups for the comment, not a reason to hold.
+- **Maintainer-only work from a non-maintainer is rework: `needs-human`.** `/restructure-note`
+  changes (audited notes reshaped to the template, usually in `Restructure reference
+  note(s): …` commits) and topic-page revisions are for maintainers.
+  The maintainers aren't listed in CLAUDE.md yet; treat the author as a maintainer if
+  `GET /repos/{owner}/{repo}/collaborators/{login}/permission` returns `admin`, and otherwise
+  judge by the shape of the change.
 - **Research questions:** a member's PR should add only `research_questions/<slug>.md` and its
   row in `research_questions/README.md`. Library changes it suggests belong in a final
   `## Suggested library updates` section. If it also adds sections to `topics/_queue/`, that's
