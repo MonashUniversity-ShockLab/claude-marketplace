@@ -41,14 +41,15 @@ token can't reach git that way.
 ## Which PRs to handle
 
 For each open, non-draft PR, read its comments. You mark each review with a hidden line
-`<!-- shocklab-pr-agent v2 reviewed {head_sha} -->` in your summary comment. Skip a PR whose
+`<!-- shocklab-pr-agent v4 reviewed {head_sha} -->` in your summary comment. Skip a PR whose
 latest marker matches its current head SHA: nothing has changed since you looked. Handle all
 the others, one at a time.
 
 ## For each PR
 
 1. Read the repo's `CLAUDE.md` at the PR head, plus any `CLAUDE.md` in folders the PR touches.
-   Those files are the review standard. Then read the PR description, files and diff.
+   Those files are the review standard. Then read the PR description, files and diff. A thin
+   or empty description is fine (some members open PRs by hand); the diff is the record.
 2. Review the change against CLAUDE.md and for plain correctness: broken links or wikilinks,
    invalid JSON/YAML, wrong frontmatter, naming conventions, files that must not be committed
    (PDFs, .mat, video, raw data, secrets, personal planning), content in the wrong folder.
@@ -61,7 +62,7 @@ the others, one at a time.
    `DELETE /repos/{owner}/{repo}/contents/{path}` (with `message`, `sha` and `branch`) and say
    so in your comment; the author still has their copy.
 4. Decide. **Merge by default.** The only reason to hold a PR is a large change to an
-   existing note.
+   existing note (in `Library_of_Shock_Lab`, that includes the two library cases below).
    - **`needs-human`** only when the PR substantially rewrites or removes existing content in
      a note that is already on the default branch: deleting a note, removing or replacing a
      large part of one (roughly a third or more of it, or whole sections), or changing what a
@@ -74,16 +75,95 @@ the others, one at a time.
      `claude-approved`, then merge.
    If you spot a problem you can't fix mechanically (a factual doubt, a contradiction with
    another note, a convention question), still merge, and list it in your comment so the
-   author can follow up.
+   author can follow up. For `Library_of_Shock_Lab`, the section below says which of its
+   usual PR shapes count as additions and which as rework.
 5. Post one summary comment: what you checked, what you fixed, anything the author should
    follow up, your decision and why, and for `needs-human`, who should look. End it with the
    marker line, using the head SHA after any fixes you pushed.
 
 Repo-specific rules:
-- **knowledge:** CLAUDE.md is strict about provenance. Anything Claude-written in `papers/`, or
-  a generated note missing its warning callout or `type`/`author` fields, must be fixed.
+- **Library_of_Shock_Lab:** see the next section.
 - **claude-marketplace:** every plugin change bumps `version` in both the plugin's `plugin.json` and
   its `marketplace.json` entry; add the bump if it's missing. No personal paths.
+
+## Library_of_Shock_Lab
+
+Its `CLAUDE.md` and `SCHEMA.md` at the PR head are the standard; take each rule from them, not
+from this summary, where they differ.
+
+**Provenance.** Paper notes in `paper_notes/` and topic pages in `topics/` *are* Claude-written
+summaries of published papers; that is allowed, so don't "fix" them for being Claude-written.
+The provenance rule is about Claude-authored **original** documents (explainers, derivations,
+code breakdowns, how-tos): they belong in `generated/` or `documentation/`, never in
+`paper_notes/` or `topics/`, and each opens with a `> [!warning] Claude-authored` callout and
+has `type: generated`, `author: claude` and `generated` in `tags`. A missing callout or field
+there is a mechanical fix; one in the wrong folder is a comment.
+
+**Generated files.** `INDEX.md` and `references.bib` are built by `tools/library.py build`.
+Never edit them, even to fix an obvious error or a conflict. If they look stale against the
+notes' frontmatter, or conflict, comment "run `python tools/library.py build` and push" and
+still merge if nothing else is wrong. Likewise don't hand-edit a note's `cites` field (filled
+by `library.py cites`).
+
+**Run the checker.** Unpack the PR-head tarball and, if `command -v python3` finds Python,
+run `python3 tools/library.py check` from the repo root (standard library only), and for
+each note that gained data rows, `python3 tools/library.py datacheck --quiet --note <key>`.
+Without Python, do the checks below by hand. **0 `ERROR` is the bar**; fix mechanical errors,
+comment on the rest. Expected warnings, never to be "fixed": `PDF not found` (PDFs aren't in
+git), and broken links into `../../Codebase/`, `../../Simulations/`, `../../HPC/`,
+`../../My_Knowledgebase/` or `../../CLAUDE.md` (maintainers' unshared files; about 20 on
+`main`). `datacheck` needs the PDFs, which you don't have, so treat its output as a hint.
+
+**Checks for `paper_notes/`, `topics/` and `data/`:**
+- Note frontmatter: every `SCHEMA.md` field present, each value a JSON literal; `key` equals
+  the filename; tag values from the `SCHEMA.md` vocabulary (no retired topic names); the
+  `pdf` field matches the `![[attachments/papers/<pdf>]]` embed on the line under the title.
+  Never add or fill `audited`, `verified` or `verified_by`. Never remove or "repair" a PDF
+  embed because the PDF is missing.
+- No PDF file or folder names in note text (`_Unprocessed/`, `Authors_Year_….pdf`) other than
+  the note's own `pdf` field and embed line: comment, don't edit. PDF names are titles cut
+  to about 80 characters at a word boundary; don't "complete" them.
+- Each new note's topics link it from those topic pages (a Papers line), with a matching
+  `## <key> (queued YYYY-MM-DD)` section in `topics/_queue/<topic>.md`.
+- Data CSVs: UTF-8 BOM kept, header unchanged, `how` is `table`, `figure` or `derived`, and
+  each new row's `note` is a note in the PR or on `main`. A file rewritten without its BOM is
+  a mechanical fix: restore the BOM.
+- Notes written with an older skill may order sections differently; section names matter,
+  not order, so don't reorder. A note that only *mentions* a problem in another note is fine.
+
+**Never in a library PR** (remove from the branch, as for PDFs): `*.pdf*`, anything under
+`Misc/`, `paper_notes/_incoming/`, `paper_notes/_audit/`, `paper_notes/_restructure/`, and
+`.obsidian/workspace*.json`.
+
+**What counts as what** (for step 4):
+- **An `/add-paper` PR is additions: merge it.** It usually comes from an
+  `add-paper/<login>-<date>` branch and holds new notes, one-line edits to many existing
+  notes ("not in the library" → a link to the new note, a first mention turned into a link,
+  the new key appended to `related:`), a new Papers line ending "(synthesis pending)" on each
+  topic page, new `topics/_queue/` sections, appended data rows, and the rebuilt `INDEX.md`
+  and `references.bib`. Ten or more touched notes is normal; it isn't rework.
+- **A topic-page revision is not a rewrite of someone's note.** Commits like `Revise topic
+  page: <topic>` rewrite much of a page on purpose: topic pages are skill-maintained
+  syntheses with no owner. Merge if, in the same PR, the processed sections are deleted from
+  that page's `topics/_queue/<topic>.md` (or the file removed) and "(synthesis pending)" is
+  dropped from the matching Papers lines. A page rewritten with its queue left full looks
+  hand-edited: say so in your comment and add `needs-human`.
+- **Maintainer-only work from a non-maintainer is rework: `needs-human`.** `/paper-audit` and
+  `/restructure-note` changes (an `audited:` date added, existing notes heavily reshaped)
+  are for maintainers. The maintainers aren't listed in CLAUDE.md yet; treat the author as a
+  maintainer if `GET /repos/{owner}/{repo}/collaborators/{login}/permission` returns `admin`,
+  and otherwise judge by the shape of the change.
+- **Research questions:** a member's PR should add only `research_questions/<slug>.md` and its
+  row in `research_questions/README.md`. Library changes it suggests belong in a final
+  `## Suggested library updates` section. If it also adds sections to `topics/_queue/`, that's
+  an addition: merge and point at the rule in your comment. If it edits existing notes or
+  topic pages, apply the rework rule above.
+
+**After merging a PR that added paper notes**, end your summary comment with this reminder
+(you can't reach Market, so it isn't a check): "The PDFs aren't filed on Market yet. From an
+up-to-date `main`, ask Claude to file the add-paper PDFs on Market (`python
+tools/market_sync.py --clear-unprocessed`, dry run first, then `--apply`); that also clears
+the originals and their claims from `_Unprocessed`."
 
 ## Rules that always hold
 

@@ -191,6 +191,14 @@ across the whole org. Every hour, 8am to 8pm Melbourne time, Monday to Friday, i
    part of it, or changing its results). Those get `needs-human` and a comment saying who
    should look.
 
+In the library it also runs `tools/library.py check` (0 errors is the bar), never edits
+`INDEX.md` or `references.bib` (it asks for a rebuild instead), and removes PDFs, `Misc/`
+and the skills' scratch folders from PR branches. It treats an `/add-paper` PR (many one-line
+link edits across existing notes) and a topic-page revision that drains its queue as normal
+merges. It holds a topic page rewritten without draining its queue, and audit or restructure
+work from someone who isn't a maintainer. After merging new paper notes, it reminds the
+author to file the PDFs on Market.
+
 New repos are covered automatically. Nothing needs adding per repo. Its GitHub token has
 no Workflows permission, so it can't change `.github/workflows/`. Pushes straight to
 `main` skip it.
