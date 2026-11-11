@@ -172,9 +172,51 @@ questions are shared: `/research-question` saves them in the clone's `research_q
 with an `author:` field, and any member may add one on a branch with a PR (just the
 question file and its README row; never someone else's question without asking them).
 
-Optional: suggest opening the clone as an Obsidian vault with the Dataview plugin.
+### 7. Obsidian, if they want it (optional)
 
-### 7. M3, if they will use it
+The library is an Obsidian vault: notes link to each other, paper notes embed their PDFs,
+and dashboards (`Home.md`, `Tasks.md`, the `_*.md` index pages) list notes, owners and open
+tasks. Everything also works without Obsidian, as plain Markdown. Ask: **"Do you want to
+browse the library in Obsidian?"** If not, skip, and mention in the summary that they can
+ask any time ("set up Obsidian for the library").
+
+On their yes:
+
+1. **Obsidian installed?** Check first (Windows: `winget list --id Obsidian.Obsidian`, or
+   `%LOCALAPPDATA%\Programs\Obsidian\Obsidian.exe`; macOS: `/Applications/Obsidian.app`).
+   If it's missing, ask, then install: `winget install -e --id Obsidian.Obsidian` (Windows),
+   `brew install --cask obsidian` (macOS), or the AppImage/Flatpak from obsidian.md
+   (Linux). It's free; no account is needed.
+2. **The lab's plugins.** The clone already carries the shared vault settings in
+   `.obsidian/` (`community-plugins.json` lists the two plugins below; `app.json` keeps links
+   updated when notes are renamed). The plugin code itself isn't in git, so download each
+   plugin's latest release into the clone (ask first; both are open source, MIT-licensed):
+   - **Dataview** (`dataview`): draws the tables on the dashboards and index pages. Without
+     it they show as raw `dataview` code blocks.
+     `gh release download -R blacksmithgu/obsidian-dataview -p main.js -p manifest.json -p styles.css -D "<clone>/.obsidian/plugins/dataview" --clobber`
+   - **HTML Reader** (`obsidian-html-plugin`): opens the interactive `.html` guides next to
+     their notes in `documentation/` and `generated/`.
+     `gh release download -R nuthrash/obsidian-html-plugin -p main.js -p manifest.json -D "<clone>/.obsidian/plugins/obsidian-html-plugin" --clobber`
+
+   `.obsidian/plugins/` is git-ignored, so these never get committed. Recommend just these
+   two; others they like are their own business, but don't add them to the shared
+   `community-plugins.json` without a PR.
+3. **Open the vault (they do this).** In Obsidian: *Open folder as vault* → choose the clone
+   folder **itself** (e.g. `C:\Users\<you>\ShockLab\Library_of_Shock_Lab`), not a folder
+   above it: PDF embeds resolve from the vault root, so a bigger vault breaks them. When
+   Obsidian asks whether to trust the vault's author and enable plugins, choose **Trust**
+   (that turns on community plugins; Claude can't click it for them). If they already have
+   their own Obsidian vault, keep the library as a separate vault; never put one inside the
+   other.
+4. **Check it worked:** open `Home.md`: its tables should fill in. If they show code
+   instead, Dataview isn't on (*Settings → Community plugins*: turn off Restricted mode, then
+   enable Dataview and HTML Reader).
+5. **What not to commit:** Obsidian rewrites `.obsidian/workspace*.json` as they click
+   around; it's git-ignored. Paper PDFs in `attachments/papers/` stay out of git too. If
+   Obsidian ever shows other `.obsidian/` changes in `git status`, leave them uncommitted
+   unless they mean to change the lab's shared settings (by PR).
+
+### 8. M3, if they will use it
 
 Ask whether they will run jobs on M3 (MASSIVE). If not, skip. If so, follow the library's
 `documentation/M3 Guide.md` §0–§3 with them. Two things only they can do, so check first
@@ -191,7 +233,7 @@ put the public key on M3 (§2; Route A asks for their M3 password once, which **
 in their own terminal, never in chat), add the `~/.ssh/config` entry (§3) and test with
 `ssh <host> "hostname; whoami"`. Never copy a private key anywhere or print it.
 
-### 8. Their own project folder in git
+### 9. Their own project folder in git
 
 Most members never put their own work under version control because they don't know git,
 and a deleted script or a broken edit is then gone for good. Offer to do it with them; you
@@ -251,7 +293,7 @@ folder is, how the data flows, where data lives), so Claude starts every session
 their work: draft it from what you saw in step 1 and let them edit it. It goes in the
 first commit, or a second one.
 
-### 9. Bring in what they already know
+### 10. Bring in what they already know
 
 Ask: **"Where is your current knowledge stored?"** (note folders or vaults, project
 `CLAUDE.md`s and READMEs, Claude memory, HPC notes, paper folders such as `Literature/`
@@ -268,7 +310,7 @@ the plugin's `/import-knowledge` only loads in a new session). It needs step 6 d
 Market mounted for the papers part. If they'd rather wait, tell them to run
 `/import-knowledge` in a new session whenever they like. Either way, don't skip asking.
 
-### 10. Finish
+### 11. Finish
 
 Tell them:
 
@@ -284,8 +326,9 @@ Tell them:
   `/add-paper`, which opens a pull request with the note (it reads each paper in full, so
   it is token-heavy). Anyone can also audit an older note with `/paper-audit` (also by pull
   request, after claiming the note). `/restructure-note` is for maintainers only.
-- Read `onboarding/Getting started.md` and `CLAUDE.md` in the library clone.
-- If they skipped step 9: `/import-knowledge` brings their existing notes and papers into
+- Read `onboarding/Getting started.md` and `CLAUDE.md` in the library clone (in Obsidian,
+  start at `Home.md`).
+- If they skipped step 10: `/import-knowledge` brings their existing notes and papers into
   the library whenever they're ready.
 
 ## Working on plugins here
