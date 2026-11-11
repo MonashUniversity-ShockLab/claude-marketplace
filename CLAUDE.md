@@ -201,6 +201,20 @@ On their yes:
    `.obsidian/plugins/` is git-ignored, so these never get committed. Recommend just these
    two; others they like are their own business, but don't add them to the shared
    `community-plugins.json` without a PR.
+
+   **HTML Reader needs Unrestricted Mode for the guides to work.** Its default *Balance
+   Mode* strips every `<script>`, so the interactive guides show raw `$…$` TeX and empty demo
+   boxes. Equations and demos only work in **Unrestricted Mode**. Explain the cost before
+   asking, as the library's `documentation/Interactive HTML Guides.md` does: in that mode
+   any script in any `.html` file in the vault runs inside Obsidian with no sandbox (it can
+   read and write their files), and the vault is a shared repo everyone pushes to. So they
+   should read the diff of any `.html` someone else commits before opening it. Ask:
+   **"Turn on Unrestricted Mode so the interactive guides work in Obsidian?"** On yes, write
+   `.obsidian/plugins/obsidian-html-plugin/data.json` with `"opMode": "UnestrictedMode"` (the
+   plugin's own spelling; keep any other keys already there), or have them set *Settings →
+   HTML Reader → Operating Mode → Unrestricted Mode*. On no, leave Balance Mode: the guides'
+   text still reads, and they can open a guide in their web browser for the demos (*Settings
+   → Files and links → Detect all file extensions* shows `.html` files in the file list).
 3. **Open the vault (they do this).** In Obsidian: *Open folder as vault* → choose the clone
    folder **itself** (e.g. `C:\Users\<you>\ShockLab\Library_of_Shock_Lab`), not a folder
    above it: PDF embeds resolve from the vault root, so a bigger vault breaks them. When
@@ -210,7 +224,10 @@ On their yes:
    other.
 4. **Check it worked:** open `Home.md`: its tables should fill in. If they show code
    instead, Dataview isn't on (*Settings → Community plugins*: turn off Restricted mode, then
-   enable Dataview and HTML Reader).
+   enable Dataview and HTML Reader). If they chose Unrestricted Mode, open
+   `generated/The Welch Method for Spectral Estimation.html`: its equations should render
+   and its demo should run. (Obsidian's "Restricted mode" for community plugins and HTML
+   Reader's "Unrestricted Mode" are different switches; both are needed for the demos.)
 5. **What not to commit:** Obsidian rewrites `.obsidian/workspace*.json` as they click
    around; it's git-ignored. Paper PDFs in `attachments/papers/` stay out of git too. If
    Obsidian ever shows other `.obsidian/` changes in `git status`, leave them uncommitted
