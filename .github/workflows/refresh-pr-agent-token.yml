@@ -1,11 +1,15 @@
-# Refreshes the PR agent's GitHub token so the agent acts as shocklab-pr-agent[bot].
+# Starts the PR agent with a fresh GitHub token, so it acts as shocklab-pr-agent[bot].
 #
-# The agent runs on the hour, 8am-8pm Melbourne, Mon-Fri (managed-agents/pr-agent/
-# deployment-hourly.yaml). GitHub App installation tokens last one hour and the agent's
-# sandbox never sees the app's private key, so this job mints a fresh token at :40 past
-# each hour and writes it into the agent's vault as GH_TOKEN.
+# GitHub App installation tokens last one hour, and the agent's sandbox never sees the
+# app's private key, so the agent can't mint its own. Each run of this workflow mints a
+# token, writes it into the agent's vault as GH_TOKEN, then starts an agent run straight
+# away. The deployment's own schedule is paused (manual runs still work while paused), so
+# this workflow is the agent's clock: hourly, 8am-8pm Melbourne, Mon-Fri.
 #
-# Cron is UTC. These two lines cover 7:40-19:40 Melbourne Mon-Fri in both AEST and AEDT.
+# GitHub's scheduler can start jobs late or skip them, so there are two slots an hour
+# (:05 and :35); a slot is skipped if the vault token was updated in the last 45 minutes.
+# Cron is UTC; the two lines cover 8am-8:59pm Melbourne in both AEST and AEDT, and the
+# first step drops slots outside those hours.
 #
 # Needs, in this repo's Actions settings:
 #   variable PR_AGENT_APP_ID       the GitHub App's ID
@@ -15,9 +19,14 @@ name: Refresh PR agent token
 
 on:
   schedule:
-    - cron: "40 20-23 * * 0-4"
-    - cron: "40 0-9 * * 1-5"
+    - cron: "5,35 21-23 * * 0-4"
+    - cron: "5,35 0-10 * * 1-5"
   workflow_dispatch:
+    inputs:
+      run_agent:
+        description: Start an agent run after refreshing the token
+        type: boolean
+        default: true
 
 permissions: {}
 
@@ -25,25 +34,55 @@ concurrency:
   group: refresh-pr-agent-token
   cancel-in-progress: false
 
+env:
+  DEPLOYMENT_ID: depl_01EbZV1SohiPntjBKyL6QMK6  # managed-agents/pr-agent/deployment-hourly.yaml
+  VAULT_ID: vlt_011CgrkLxBgcaaor8AgM82Q1        # managed-agents/pr-agent/vault.yaml
+  CREDENTIAL_ID: vcrd_011ypox3ejfNnwZcGSrq8YKM  # the GH_TOKEN credential
+
 jobs:
-  refresh:
+  run:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Decide whether this slot runs
+        id: gate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_VAULT_KEY }}
+          EVENT: ${{ github.event_name }}
+          RUN_AGENT: ${{ github.event_name == 'schedule' || inputs.run_agent }}
+        run: |
+          echo "run_agent=$RUN_AGENT" >> "$GITHUB_OUTPUT"
+          if [ "$EVENT" != "schedule" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          hour=$(TZ=Australia/Melbourne date +%-H); dow=$(TZ=Australia/Melbourne date +%u)
+          if [ "$dow" -gt 5 ] || [ "$hour" -lt 8 ] || [ "$hour" -gt 20 ]; then
+            echo "Outside 8am-8pm Melbourne Mon-Fri ($dow, ${hour}h): skipping."
+            echo "go=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          updated=$(curl -sS "https://api.anthropic.com/v1/vaults/$VAULT_ID/credentials/$CREDENTIAL_ID" \
+            -H "x-api-key: $ANTHROPIC_API_KEY" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "anthropic-beta: managed-agents-2026-04-01" | jq -r '.updated_at // empty')
+          if [ -n "$updated" ] && [ $(( $(date -u +%s) - $(date -u -d "$updated" +%s) )) -lt 2700 ]; then
+            echo "Token was refreshed at $updated, under 45 minutes ago: skipping."
+            echo "go=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          echo "go=true" >> "$GITHUB_OUTPUT"
+
       - name: Mint installation token
+        if: steps.gate.outputs.go == 'true'
         id: app
         uses: actions/create-github-app-token@v1
         with:
           app-id: ${{ vars.PR_AGENT_APP_ID }}
           private-key: ${{ secrets.PR_AGENT_APP_KEY }}
           owner: MonashUniversity-ShockLab
+          skip-token-revoke: true   # the agent uses it after this job ends
 
       - name: Write it into the agent's vault
+        if: steps.gate.outputs.go == 'true'
         env:
           TOKEN: ${{ steps.app.outputs.token }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_VAULT_KEY }}
-          VAULT_ID: vlt_011CgrkLxBgcaaor8AgM82Q1        # managed-agents/pr-agent/vault.yaml
-          CREDENTIAL_ID: vcrd_011ypox3ejfNnwZcGSrq8YKM  # the GH_TOKEN credential
         run: |
           body=$(jq -n --arg t "$TOKEN" '{auth: {type: "environment_variable", secret_value: $t}}')
           status=$(curl -sS -o response.json -w '%{http_code}' -X POST \
@@ -59,3 +98,22 @@ jobs:
             exit 1
           fi
           jq '{id, updated_at}' response.json
+
+      - name: Start an agent run
+        if: steps.gate.outputs.go == 'true' && steps.gate.outputs.run_agent == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_VAULT_KEY }}
+        run: |
+          status=$(curl -sS -o response.json -w '%{http_code}' -X POST \
+            "https://api.anthropic.com/v1/deployments/$DEPLOYMENT_ID/run" \
+            -H "x-api-key: $ANTHROPIC_API_KEY" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "anthropic-beta: managed-agents-2026-04-01" \
+            -H "content-type: application/json" \
+            --data '{}')
+          if [ "$status" != "200" ]; then
+            echo "::error::Starting the agent run failed with HTTP $status"
+            jq '{type, error}' response.json || true
+            exit 1
+          fi
+          jq '{id, session_id, error}' response.json
