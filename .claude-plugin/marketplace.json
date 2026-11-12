@@ -26,8 +26,8 @@
       "name": "shocklab-library",
       "source": "./",
       "strict": false,
-      "description": "Paper-library skills for Library_of_Shock_Lab: /lit, /research-question, /add-paper and /paper-audit (plus the paper-auditor agent) for everyone; /restructure-note (plus the note-restructurer agent) for maintainers",
-      "version": "0.4.1",
+      "description": "Paper-library skills for Library_of_Shock_Lab: /lit, /research-question, /add-paper and /paper-audit (plus the paper-auditor agent) for everyone; /restructure-note (plus the note-restructurer agent) and /update-topics (revise topic pages from their queues, apply queued note updates) for maintainers; /schedule-library-processing books an unattended overnight run of add-paper, paper-audit or update-topics for anyone",
+      "version": "0.5.0",
       "author": {
         "name": "MonashUniversity-ShockLab"
       },
@@ -38,7 +38,9 @@
         "./skills/research-question",
         "./skills/add-paper",
         "./skills/paper-audit",
-        "./skills/restructure-note"
+        "./skills/restructure-note",
+        "./skills/schedule-library-processing",
+        "./skills/update-topics"
       ],
       "agents": [
         "./agents/paper-auditor.md",
