@@ -1,3 +1,4 @@
-# Holds the GitHub token as GH_TOKEN (added separately; never in this file).
+# Holds the GitHub token as GH_TOKEN: a GitHub App installation token that
+# .github/workflows/refresh-pr-agent-token.yml replaces hourly (never in this file).
 type: vault
 display_name: shocklab-pr-agent

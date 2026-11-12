@@ -199,9 +199,10 @@ merges. It holds a topic page rewritten without draining its queue, and audit or
 work from someone who isn't a maintainer. After merging new paper notes, it reminds the
 author to file the PDFs on Market.
 
-New repos are covered automatically. Nothing needs adding per repo. Its GitHub token has
-no Workflows permission, so it can't change `.github/workflows/`. Pushes straight to
-`main` skip it.
+New repos are covered automatically (the app is installed on all of the org's
+repositories). Nothing needs adding per repo. Its GitHub App has no Workflows permission,
+so it can't change or merge `.github/workflows/`; those PRs get `needs-human`. Pushes
+straight to `main` skip it.
 
 Its definition lives in [`managed-agents/pr-agent/`](managed-agents/pr-agent/):
 
@@ -209,7 +210,7 @@ Its definition lives in [`managed-agents/pr-agent/`](managed-agents/pr-agent/):
 |---|---|
 | `agent.md` | Model and instructions (the review, fix and merge rules) |
 | `environment.yaml` | Sandbox; its network can only reach GitHub |
-| `vault.yaml` | Holds the GitHub token as `GH_TOKEN` (the token itself is added separately and never committed) |
+| `vault.yaml` | Holds the GitHub token as `GH_TOKEN` (written by the refresh workflow below; never committed) |
 | `deployment-hourly.yaml` | The schedule, plus a $3 cap per run |
 
 `claude-lock.json` records the Console IDs. To change the agent, edit the file, then run
@@ -220,9 +221,16 @@ Console, with the full transcript.
 - Pause: `ant beta:deployments pause --deployment-id <depl_... from claude-lock.json>`
 - Run now: `ant beta:deployments run --deployment-id <same>`
 
-The GitHub token is a fine-grained token on the org with Contents, Pull requests and
-Issues set to read/write, and it expires. To replace it, update the vault credential
-with `ant beta:vaults:credentials update`.
+The agent acts on GitHub as `shocklab-pr-agent[bot]`, an org-owned GitHub App with
+Contents, Pull requests and Issues set to read/write (no Workflows). App tokens last one
+hour, and the agent's sandbox never sees the app's private key, so the
+[`refresh-pr-agent-token`](.github/workflows/refresh-pr-agent-token.yml) workflow mints a
+new token at :40 past each hour, 7:40am-7:40pm Melbourne Mon-Fri, and writes it into the
+vault as `GH_TOKEN`. It needs the variable `PR_AGENT_APP_ID` and the secrets
+`PR_AGENT_APP_KEY` (the app's private key) and `ANTHROPIC_VAULT_KEY` (a Console API key in
+the ShockLab workspace) in this repo's Actions settings. If a refresh fails, the agent's
+next run stops on `401 Bad credentials` and the one after recovers; run the workflow by
+hand from the Actions tab to refresh straight away.
 
 ## Layout
 

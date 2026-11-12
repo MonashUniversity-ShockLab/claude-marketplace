@@ -1,0 +1,61 @@
+# Refreshes the PR agent's GitHub token so the agent acts as shocklab-pr-agent[bot].
+#
+# The agent runs on the hour, 8am-8pm Melbourne, Mon-Fri (managed-agents/pr-agent/
+# deployment-hourly.yaml). GitHub App installation tokens last one hour and the agent's
+# sandbox never sees the app's private key, so this job mints a fresh token at :40 past
+# each hour and writes it into the agent's vault as GH_TOKEN.
+#
+# Cron is UTC. These two lines cover 7:40-19:40 Melbourne Mon-Fri in both AEST and AEDT.
+#
+# Needs, in this repo's Actions settings:
+#   variable PR_AGENT_APP_ID       the GitHub App's ID
+#   secret   PR_AGENT_APP_KEY      the app's private key (.pem contents)
+#   secret   ANTHROPIC_VAULT_KEY   a Console API key in the ShockLab workspace
+name: Refresh PR agent token
+
+on:
+  schedule:
+    - cron: "40 20-23 * * 0-4"
+    - cron: "40 0-9 * * 1-5"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: refresh-pr-agent-token
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Mint installation token
+        id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.PR_AGENT_APP_ID }}
+          private-key: ${{ secrets.PR_AGENT_APP_KEY }}
+          owner: MonashUniversity-ShockLab
+
+      - name: Write it into the agent's vault
+        env:
+          TOKEN: ${{ steps.app.outputs.token }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_VAULT_KEY }}
+          VAULT_ID: vlt_011CgrkLxBgcaaor8AgM82Q1        # managed-agents/pr-agent/vault.yaml
+          CREDENTIAL_ID: vcrd_011ypox3ejfNnwZcGSrq8YKM  # the GH_TOKEN credential
+        run: |
+          body=$(jq -n --arg t "$TOKEN" '{auth: {type: "environment_variable", secret_value: $t}}')
+          status=$(curl -sS -o response.json -w '%{http_code}' -X POST \
+            "https://api.anthropic.com/v1/vaults/$VAULT_ID/credentials/$CREDENTIAL_ID" \
+            -H "x-api-key: $ANTHROPIC_API_KEY" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "anthropic-beta: managed-agents-2026-04-01" \
+            -H "content-type: application/json" \
+            --data "$body")
+          if [ "$status" != "200" ]; then
+            echo "::error::Vault update failed with HTTP $status"
+            jq '{type, error}' response.json || true
+            exit 1
+          fi
+          jq '{id, updated_at}' response.json
