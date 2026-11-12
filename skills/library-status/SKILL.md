@@ -23,10 +23,12 @@ A quick read-only report of what is waiting to be done in the shared paper libra
 Run `library.py topics`. Its columns are `page, papers, words, updated, queued, oldest, flags`, under `-- <group>` header lines. From the rows with `queued` > 0, report:
 
 - the totals: queued contributions and the number of pages that have any;
-- pages flagged `revision due` (10 or more queued, or the oldest more than 21 days old; `/add-paper` revises these on its next run);
+- pages flagged `revision due` (10 or more queued, or the oldest more than 21 days old; a maintainer's next `/add-paper` or `/paper-audit` run revises these, and anyone can with `/update-topics`);
 - pages with a **major correction** queued: queue files in `<library>/topics/_queue/` with a heading containing `**major.**` (search for it). List these first, since a major correction means the page currently says something wrong;
 - a table of pages with queued items, largest queue first: page, queued, oldest. If there are more than 15, show the top 15 and give a count for the rest;
 - any queue file whose page doesn't exist in `<library>/topics/` (for example a retired name in `SCHEMA.md` "Retired topic names"). Report it; never fix it here.
+
+**Pages being revised:** run `paper_claim.py list --topic` (section 4 explains how `paper_claim.py` finds Market; if Market isn't reachable, say this part is unavailable). Report `mine`, `taken` (who, how long ago, branch) and `stale` claims: those pages are being revised by an `/update-topics` or maintainer run, so their queues will shrink once its pull request merges. Give only the count of `done` claims. If the tool says `--topic` is unknown, the clone predates topic claims: say so and skip this.
 
 Pages flagged `over 5k words` are not part of the queue, but mention them in one line, because they are candidates for a split when they are next revised.
 
@@ -34,7 +36,7 @@ Pages flagged `over 5k words` are not part of the queue, but mention them in one
 
 Both files are in `<library>/paper_notes/_queue/`. Count from the file; don't summarise every item.
 
-- **`notes_to_update.md`** (queued changes to existing notes): the number of notes (`## <note key>` sections) and of items (`- ` bullets under them), and how many items are marked `[PDF]` (they need the PDF to confirm). List the note keys if there are 10 or fewer. `/add-paper` applies them in a batch once 10 or more notes are listed, and `/update-topics` (maintainers) applies them on demand.
+- **`notes_to_update.md`** (queued changes to existing notes): the number of notes (`## <note key>` sections) and of items (`- ` bullets under them), and how many items are marked `[PDF]` (they need the PDF to confirm). List the note keys if there are 10 or fewer. A maintainer's `/add-paper` run applies them in a batch once 10 or more notes are listed, and `/update-topics` (anyone) applies them on demand.
 - **`notes_to_check.md`** (parts of notes still to verify against the PDFs): the number of open lines (`- ` bullets), split into per-paper lines and those under the `# Cross-note inconsistencies` heading. Then say how many of the per-paper lines say `audited` and how many don't. Lines with no audit are the ones `/paper-audit` will most likely resolve. `/paper-audit` deletes each item it resolves.
 If a file is missing, say so (no queue yet). Don't create it.
 
@@ -81,8 +83,8 @@ Keep it short: a heading per section asked for, with counts first and then the l
 - errors in the health line → fix them (`library.py check` names each one);
 - PDFs not filed on Market → the person who added each note asks Claude to "file the add-paper PDFs on Market" from their own clone (or this user does, for the ones this clone can move or copy);
 - free Market papers → `/add-paper` (anyone; token-heavy, about 150k–200k tokens per paper);
-- topic pages due for revision, or major corrections queued → `/update-topics` (maintainers);
-- 10 or more notes in `notes_to_update.md` → `/update-topics --notes-only` (maintainers), or let the next `/add-paper` run apply them;
+- topic pages due for revision, or major corrections queued → `/update-topics` (anyone; it claims each page, 3 pages per member run by default);
+- 10 or more notes in `notes_to_update.md` → `/update-topics --notes-only` (anyone), or let the next maintainer `/add-paper` run apply them;
 - notes waiting in the audit queue, or open `notes_to_check.md` lines → `/paper-audit` (token-heavy, a large share of a usage window per note);
 - the clone behind `origin/main` → `git -C <library> pull`.
 
