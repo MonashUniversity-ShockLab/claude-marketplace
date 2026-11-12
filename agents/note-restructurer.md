@@ -36,6 +36,7 @@ Your prompt gives the note key, its PDF page count, its word target, its current
 - **Length.** Get to the word target by cutting repetition (the same result stated in several sections), restated textbook background and wordy phrasing. **Never** drop a number, a page reference, a correction ("was / now"), a caveat or hedge, a link to another note, or anything marked to verify. If the target can't be reached without that, stop above it.
 - If something looks wrong or inconsistent, leave it and list it in the result file.
 - Keep project-specific Relevance text (about the user's own projects) as it is: don't drop or move it; the next audit moves it to the user's own files.
+- Add no link to or mention of anything outside the library (SCHEMA "Nothing outside the library"): a member's files, folders, code, guides or plans.
 
 ## Steps (keep the context small)
 
