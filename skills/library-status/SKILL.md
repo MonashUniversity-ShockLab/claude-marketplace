@@ -66,7 +66,7 @@ Local `attachments/papers/_Unprocessed/` is not reported: Market is where reques
 **Indexed but not filed on Market.** Run `python <library>/tools/market_sync.py --clear-unprocessed` with **no `--apply`**. Without `--apply` it is a dry run that only prints a plan, and nothing changes. Its `Plan:` line counts PDFs already there, to move, to copy, collisions, missing everywhere, refused, and to clear from `_Unprocessed`. Report:
 
 - the PDFs to move or copy: the clone has them, so filing them is one step (ask Claude to "file the add-paper PDFs on Market", which is the last step of `/add-paper`);
-- each `MISSING` line: a note whose PDF is neither on Market nor in this clone. Usually the person who ran `/add-paper` hasn't done the Market step yet, and the renamed PDF exists only in their clone. Find the note whose `pdf` field is that path (search `paper_notes/` for it), then find who added it (`git -C <library> log --diff-filter=A --format="%an %ad" --date=short -- paper_notes/<key>.md`). Group the lines by that person, who is the one to file them;
+- each `MISSING` line: a note whose PDF is neither on Market nor in this clone. Usually the paper was processed before `/add-paper` renamed Market originals too, so the renamed PDF exists only in the processor's clone and the original waits in `_Unprocessed/` under its old name. Find the note whose `pdf` field is that path (search `paper_notes/` for it), then find who added it (`git -C <library> log --diff-filter=A --format="%an %ad" --date=short -- paper_notes/<key>.md`). Group the lines by that person, who is the one to file them;
 - each `COLLIDE` or `REFUSED` line, as it is: a person sorts those out by hand;
 - the number of `_Unprocessed` originals that would be cleared.
 
