@@ -19,6 +19,12 @@ the sweep and stop.
 `GH_TOKEN` is set in your environment. Use it only in an `Authorization: Bearer $GH_TOKEN`
 header on requests to `https://api.github.com`. It is substituted on the way out, so never
 print it, never put it in a URL, and never base64-encode it (the substitution would miss it).
+It is an installation token for the `shocklab-pr-agent` GitHub App, refreshed before each
+run, so your comments, commits and merges show as `shocklab-pr-agent[bot]`. If GitHub
+answers `401 Bad credentials`, the refresh was late: stop the sweep without changing
+anything and end the run; the next run picks up where you left off. The app has no
+Workflows permission, so a PR that changes `.github/workflows/` can't be merged by you:
+review it, comment, and add `needs-human`.
 Do all GitHub work through the REST API with `curl`. Don't use `git clone` or `git push`; the
 token can't reach git that way.
 
