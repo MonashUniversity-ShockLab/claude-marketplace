@@ -1,15 +1,15 @@
-# Starts the PR agent with a fresh GitHub token, so it acts as shocklab-pr-agent[bot].
+# Writes a fresh GitHub token into the PR agent's vault, so it acts as shocklab-pr-agent[bot].
 #
 # GitHub App installation tokens last one hour, and the agent's sandbox never sees the
-# app's private key, so the agent can't mint its own. Each run of this workflow mints a
-# token, writes it into the agent's vault as GH_TOKEN, then starts an agent run straight
-# away. The deployment's own schedule is paused (manual runs still work while paused), so
-# this workflow is the agent's clock: hourly, 8am-8pm Melbourne, Mon-Fri.
+# app's private key, so the agent can't mint its own. Instead, the deployment's Console
+# schedule (hourly, 8am-8pm Melbourne, Mon-Fri) starts each run, and the agent's first step
+# is to start this workflow with run_agent=false (using GH_DISPATCH_TOKEN, a fine-grained
+# token that can only run workflows in this repo). This workflow mints a token and writes
+# it into the vault as GH_TOKEN; the running session picks up the new value.
 #
-# GitHub's scheduler can start jobs late or skip them, so there are two slots an hour
-# (:05 and :35); a slot is skipped if the vault token was updated in the last 45 minutes.
-# Cron is UTC; the two lines cover 8am-8:59pm Melbourne in both AEST and AEDT, and the
-# first step drops slots outside those hours.
+# There is no schedule here: GitHub's scheduler skipped almost every slot, while runs
+# started on request begin within seconds. Run it by hand from the Actions tab (run_agent
+# on) to refresh the token and start an agent run straight away.
 #
 # Needs, in this repo's Actions settings:
 #   variable PR_AGENT_APP_ID       the GitHub App's ID
@@ -18,9 +18,6 @@
 name: Refresh PR agent token
 
 on:
-  schedule:
-    - cron: "5,35 21-23 * * 0-4"
-    - cron: "5,35 0-10 * * 1-5"
   workflow_dispatch:
     inputs:
       run_agent:
@@ -44,32 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Decide whether this slot runs
-        id: gate
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_VAULT_KEY }}
-          EVENT: ${{ github.event_name }}
-          RUN_AGENT: ${{ github.event_name == 'schedule' || inputs.run_agent }}
-        run: |
-          echo "run_agent=$RUN_AGENT" >> "$GITHUB_OUTPUT"
-          if [ "$EVENT" != "schedule" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
-          hour=$(TZ=Australia/Melbourne date +%-H); dow=$(TZ=Australia/Melbourne date +%u)
-          if [ "$dow" -gt 5 ] || [ "$hour" -lt 8 ] || [ "$hour" -gt 20 ]; then
-            echo "Outside 8am-8pm Melbourne Mon-Fri ($dow, ${hour}h): skipping."
-            echo "go=false" >> "$GITHUB_OUTPUT"; exit 0
-          fi
-          updated=$(curl -sS "https://api.anthropic.com/v1/vaults/$VAULT_ID/credentials/$CREDENTIAL_ID" \
-            -H "x-api-key: $ANTHROPIC_API_KEY" \
-            -H "anthropic-version: 2023-06-01" \
-            -H "anthropic-beta: managed-agents-2026-04-01" | jq -r '.updated_at // empty')
-          if [ -n "$updated" ] && [ $(( $(date -u +%s) - $(date -u -d "$updated" +%s) )) -lt 2700 ]; then
-            echo "Token was refreshed at $updated, under 45 minutes ago: skipping."
-            echo "go=false" >> "$GITHUB_OUTPUT"; exit 0
-          fi
-          echo "go=true" >> "$GITHUB_OUTPUT"
-
       - name: Mint installation token
-        if: steps.gate.outputs.go == 'true'
         id: app
         uses: actions/create-github-app-token@v1
         with:
@@ -79,7 +51,6 @@ jobs:
           skip-token-revoke: true   # the agent uses it after this job ends
 
       - name: Write it into the agent's vault
-        if: steps.gate.outputs.go == 'true'
         env:
           TOKEN: ${{ steps.app.outputs.token }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_VAULT_KEY }}
@@ -100,7 +71,7 @@ jobs:
           jq '{id, updated_at}' response.json
 
       - name: Start an agent run
-        if: steps.gate.outputs.go == 'true' && steps.gate.outputs.run_agent == 'true'
+        if: inputs.run_agent
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_VAULT_KEY }}
         run: |
