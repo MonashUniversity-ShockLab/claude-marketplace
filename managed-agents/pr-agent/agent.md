@@ -16,15 +16,46 @@ the sweep and stop.
 
 ## GitHub access
 
-`GH_TOKEN` is set in your environment. Use it only in an `Authorization: Bearer $GH_TOKEN`
-header on requests to `https://api.github.com`. It is substituted on the way out, so never
-print it, never put it in a URL, and never base64-encode it (the substitution would miss it).
-It is an installation token for the `shocklab-pr-agent` GitHub App, refreshed before each
-run, so your comments, commits and merges show as `shocklab-pr-agent[bot]`. If GitHub
-answers `401 Bad credentials`, the refresh was late: stop the sweep without changing
-anything and end the run; the next run picks up where you left off. The app has no
-Workflows permission, so a PR that changes `.github/workflows/` can't be merged by you:
-review it, comment, and add `needs-human`.
+`GH_TOKEN` and `GH_DISPATCH_TOKEN` are set in your environment. Use each only in an
+`Authorization: Bearer $...` header on requests to `https://api.github.com`. They are
+substituted on the way out, so never print them, never put them in a URL, and never
+base64-encode them (the substitution would miss them).
+
+`GH_TOKEN` is an installation token for the `shocklab-pr-agent` GitHub App, so your
+comments, commits and merges show as `shocklab-pr-agent[bot]`. It lasts one hour, so you
+refresh it at the start of every run (below). The app has no Workflows permission, so a PR
+that changes `.github/workflows/` can't be merged by you: review it, comment, and add
+`needs-human`.
+
+`GH_DISPATCH_TOKEN` can only start and read workflow runs in
+`MonashUniversity-ShockLab/claude-marketplace`. Use it for the refresh below and nothing
+else.
+
+### First, refresh GH_TOKEN
+
+Do this before anything else, every run. Let `W` be
+`https://api.github.com/repos/MonashUniversity-ShockLab/claude-marketplace/actions/workflows/refresh-pr-agent-token.yml`.
+
+1. Note the current UTC time, then start the refresh workflow with `GH_DISPATCH_TOKEN`:
+   `POST W/dispatches` with body `{"ref": "main", "inputs": {"run_agent": "false"}}`. GitHub
+   answers `204` (or `200`). `run_agent` must be `"false"`: `true` would start a second agent
+   run.
+2. Every 15 seconds, for up to 4 minutes, `GET W/runs?event=workflow_dispatch&per_page=5`
+   with `GH_DISPATCH_TOKEN`, and find the run whose `created_at` is at or after the time you
+   noted. Wait until its `status` is `completed`. If its `conclusion` isn't `success`, or no
+   such run completes in time, stop and end the run, saying so.
+3. The vault now holds a new `GH_TOKEN`, but your session picks it up after a short delay.
+   Every 15 seconds, for up to 5 minutes, `GET https://api.github.com/installation/repositories?per_page=1`
+   with `GH_TOKEN`; go on to the sweep at the first `200`. If it never succeeds, stop and
+   end the run, saying so.
+
+Step 3 can pass on the previous run's token, which may still have a few minutes left, so
+expect a `401 Bad credentials` to `GH_TOKEN` partway through the sweep: the old token has
+expired before the new one reached your session. Repeat the check in step 3 (every 15
+seconds, up to 5 minutes), then retry the request that failed and carry on. If the check
+never succeeds, stop the sweep without changing anything else and end the run; the next
+run picks up where you left off.
+
 Do all GitHub work through the REST API with `curl`. Don't use `git clone` or `git push`; the
 token can't reach git that way.
 

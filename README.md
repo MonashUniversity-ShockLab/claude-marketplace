@@ -210,31 +210,31 @@ Its definition lives in [`managed-agents/pr-agent/`](managed-agents/pr-agent/):
 |---|---|
 | `agent.md` | Model and instructions (the review, fix and merge rules) |
 | `environment.yaml` | Sandbox; its network can only reach GitHub |
-| `vault.yaml` | Holds the GitHub token as `GH_TOKEN` (written by the refresh workflow below; never committed) |
-| `deployment-hourly.yaml` | The deployment, plus a $3 cap per run. It is **paused**: the refresh workflow below starts each run |
+| `vault.yaml` | Holds the GitHub tokens `GH_TOKEN` and `GH_DISPATCH_TOKEN` (never committed) |
+| `deployment-hourly.yaml` | The Console schedule (hourly, 8am-8pm Melbourne, Mon-Fri), plus a $3 cap per run |
 
 `claude-lock.json` records the Console IDs. To change the agent, edit the file, then run
 `ant apply managed-agents/pr-agent/<file>` from the repo root, signed in with
 `ant auth login` to the ShockLab workspace. Each run shows up as a session in the
 Console, with the full transcript.
 
-- Run now: from the Actions tab, run **Refresh PR agent token** (refreshes the token, then
-  starts a run). `ant beta:deployments run` also starts one, but only works if the token in
-  the vault is under an hour old.
-- Stop it: disable the **Refresh PR agent token** workflow in the Actions tab.
+- Run now: `ant beta:deployments run --deployment-id <depl_... from claude-lock.json>`, or
+  from the Actions tab run **Refresh PR agent token** with "Start an agent run" ticked.
+- Pause: `ant beta:deployments pause --deployment-id <same>` (`unpause` to resume).
 
 The agent acts on GitHub as `shocklab-pr-agent[bot]`, an org-owned GitHub App with
 Contents, Pull requests and Issues set to read/write (no Workflows). App tokens last one
-hour, and the agent's sandbox never sees the app's private key, so the
-[`refresh-pr-agent-token`](.github/workflows/refresh-pr-agent-token.yml) workflow is the
-agent's clock: hourly, 8am-8pm Melbourne Mon-Fri, it mints a token, writes it into the
-vault as `GH_TOKEN`, and starts an agent run straight away. GitHub's scheduler can be late
-or skip a slot, so the workflow has two slots an hour (:05 and :35) and skips one if the
-token was refreshed in the last 45 minutes; a skipped hour is just a missed sweep. The
-deployment's own schedule is paused (manual runs still work while paused). The workflow
-needs the variable `PR_AGENT_APP_ID` and the secrets `PR_AGENT_APP_KEY` (the app's private
-key) and `ANTHROPIC_VAULT_KEY` (a Console API key in the ShockLab workspace) in this repo's
-Actions settings.
+hour, and the agent's sandbox never sees the app's private key, so it can't mint its own.
+Instead, each run's first step starts the
+[`refresh-pr-agent-token`](.github/workflows/refresh-pr-agent-token.yml) workflow, which
+mints a token and writes it into the vault as `GH_TOKEN`; the running session picks up the
+new value within a few minutes, and the sweep begins. To start the workflow, the agent uses
+`GH_DISPATCH_TOKEN`, a fine-grained token that can only read and run Actions in this repo.
+It has an expiry date: when it lapses, runs stop at the first step, so make a new one and
+update the credential. The workflow has no schedule of its own (GitHub's scheduler skipped
+almost every slot). It needs the variable `PR_AGENT_APP_ID` and the secrets
+`PR_AGENT_APP_KEY` (the app's private key) and `ANTHROPIC_VAULT_KEY` (a Console API key in
+the ShockLab workspace) in this repo's Actions settings.
 
 ## Layout
 

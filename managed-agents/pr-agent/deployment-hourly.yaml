@@ -1,6 +1,6 @@
-# Sweeps the org for open PRs. PAUSED: runs are started by
-# .github/workflows/refresh-pr-agent-token.yml right after it refreshes GH_TOKEN, hourly
-# 8am-8pm Melbourne Mon-Fri. The schedule below is kept for reference only.
+# Sweeps the org for open PRs every hour, 8am-8pm Melbourne time, Monday-Friday. Each run
+# first starts .github/workflows/refresh-pr-agent-token.yml to get a fresh GH_TOKEN
+# (see agent.md, "First, refresh GH_TOKEN").
 agent: ./agent.md
 environment_id: ./environment.yaml
 vault_ids: [vlt_011CgrkLxBgcaaor8AgM82Q1]   # the shocklab-pr-agent vault (vault.yaml)
