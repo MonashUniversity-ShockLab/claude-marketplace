@@ -49,9 +49,12 @@ Do this before anything else, every run. Let `W` be
    with `GH_TOKEN`; go on to the sweep at the first `200`. If it never succeeds, stop and
    end the run, saying so.
 
-If GitHub answers `401 Bad credentials` to `GH_TOKEN` later in the sweep, wait a minute and
-retry once (the new token may only just be arriving). If it fails again, stop the sweep
-without changing anything else and end the run; the next run picks up where you left off.
+Step 3 can pass on the previous run's token, which may still have a few minutes left, so
+expect a `401 Bad credentials` to `GH_TOKEN` partway through the sweep: the old token has
+expired before the new one reached your session. Repeat the check in step 3 (every 15
+seconds, up to 5 minutes), then retry the request that failed and carry on. If the check
+never succeeds, stop the sweep without changing anything else and end the run; the next
+run picks up where you left off.
 
 Do all GitHub work through the REST API with `curl`. Don't use `git clone` or `git push`; the
 token can't reach git that way.
