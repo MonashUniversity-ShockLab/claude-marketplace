@@ -82,7 +82,7 @@ Show:
 
 - **Repo name** (default: the app's name as the user writes it, e.g. `FieldsPlayer`; check
   it's free with `gh repo view MonashUniversity-ShockLab/<name>`), a one-line description,
-  private, `members` team with push access, maintainer = the user's GitHub login.
+  private, `shocklab` team (the org's members team) with push access, maintainer = the user's GitHub login.
 - **History**: kept (subfolder split or the existing repo pushed as-is) or a fresh first
   commit (not in git, or secrets/large files in the history: then **don't** push the old
   history; start fresh from the cleaned working tree, and say why).
@@ -113,7 +113,7 @@ Then, on the user's yes:
 ```
 gh repo create MonashUniversity-ShockLab/<name> --private --description "<one line>"
 git push https://github.com/MonashUniversity-ShockLab/<name>.git <branch>:main
-gh api -X PUT orgs/MonashUniversity-ShockLab/teams/members/repos/MonashUniversity-ShockLab/<name> -f permission=push
+gh api -X PUT orgs/MonashUniversity-ShockLab/teams/shocklab/repos/MonashUniversity-ShockLab/<name> -f permission=push
 ```
 
 ## 4. Point the folder at the new repo (it stays where it is)

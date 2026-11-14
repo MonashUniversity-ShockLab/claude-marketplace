@@ -5,7 +5,7 @@ for the lab: agents, skills and commands that know how we work.
 
 ## Install
 
-You need read access to this private repo (be in the org's `members` team) and git
+You need read access to this private repo (be in the org's `shocklab` team) and git
 credentials for GitHub on your machine (`gh auth login` then `gh auth setup-git`).
 
 **Recommended: add this to your user settings**, `~/.claude/settings.json`

@@ -45,7 +45,7 @@ it fails without a clear error.
 - `pending`: they haven't accepted the invite. Send them to
   https://github.com/orgs/MonashUniversity-ShockLab/invitation, then re-check.
 - 404 or error: they haven't been invited. **Stop here.** Tell them to ask an org owner to
-  add their GitHub username (`gh api user --jq .login`) to the `members` team.
+  add their GitHub username (`gh api user --jq .login`) to the `shocklab` team (the org's members team).
 
 Then confirm git can read the repos without prompting:
 `GIT_TERMINAL_PROMPT=0 git ls-remote https://github.com/MonashUniversity-ShockLab/claude-marketplace.git HEAD`
