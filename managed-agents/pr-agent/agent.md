@@ -79,8 +79,10 @@ token can't reach git that way.
 
 For each open, non-draft PR, read its comments. You mark each review with a hidden line
 `<!-- shocklab-pr-agent v4 reviewed {head_sha} -->` in your summary comment. Skip a PR whose
-latest marker matches its current head SHA: nothing has changed since you looked. Handle all
-the others, one at a time.
+latest marker matches its current head SHA: nothing has changed since you looked. The
+exception is a `Library_of_Shock_Lab` PR that now conflicts with `main` (`mergeable`
+`false`) and has no `needs-human` label: another PR merged after you reviewed it, so handle
+it again (see "Conflicts with `main`"). Handle all the others, one at a time.
 
 ## For each PR
 
@@ -137,10 +139,54 @@ has `type: generated`, `author: claude` and `generated` in `tags`. A missing cal
 there is a mechanical fix; one in the wrong folder is a comment.
 
 **Generated files.** `INDEX.md` and `references.bib` are built by `tools/library.py build`.
-Never edit them, even to fix an obvious error or a conflict. If they look stale against the
-notes' frontmatter, or conflict, comment "run `python tools/library.py build` and push" and
-still merge if nothing else is wrong. Likewise don't hand-edit a note's `cites` field (filled
-by `library.py cites`).
+Never edit them by hand, even to fix an obvious error. If they look stale against the notes'
+frontmatter, comment "run `python tools/library.py build` and push" and still merge if
+nothing else is wrong. A conflict in them is handled by the next paragraph, which rebuilds
+them. Likewise don't hand-edit a note's `cites` field (filled by `library.py cites`), except
+to combine the two sides' lists in a conflict as below.
+
+**Conflicts with `main`.** Library PRs often run in parallel (overnight add-paper, audit and
+update-topics runs all start from the same `main`), so one that merges first leaves the next
+conflicting in shared files. When the PR's `mergeable` is `false` (`mergeable_state`
+`dirty`), bring its branch up to date before reviewing, but only for a PR whose head is in
+this repo (`head.repo.full_name` equals the base repo; you can't push to a fork):
+
+1. Try GitHub's own merge first: `POST /repos/{owner}/{repo}/merges` with
+   `{"base": "<head_ref>", "head": "main", "commit_message": "Merge main into <head_ref>"}`.
+   `201` means it merged cleanly; re-read the PR and carry on. `409` means a real conflict:
+   go on.
+2. Find the files changed on both sides. `GET .../compare/main...{head_sha}` gives the
+   merge base (`merge_base_commit.sha`) and the PR's files; `GET .../compare/{merge_base}...main`
+   gives main's files. The files in both lists are the conflicts.
+3. Resolve them only if every one of them is in this list (these are the rules `/add-paper`
+   uses when it rebases):
+   - `INDEX.md`, `references.bib`: take main's version, and rebuild in step 4.
+   - `topics/_queue/*.md`, `paper_notes/_queue/*.md`, `data/*.csv`: main's version, then the
+     lines the PR added since the merge base (whole `## ` sections for a topic queue; rows
+     for a data table, without repeating the header) that main doesn't already have. If main
+     deleted the file (an update-topics run worked its queue into the page), the file is the
+     PR's added sections only, under the base's header lines if any. If the PR removed lines
+     from that file (it isn't purely additive), stop: this rule doesn't cover it.
+   - A note whose only conflicting change is its `cites:` or `related:` line: main's version
+     of the note, with that line set to main's list plus the PR's entries not in it.
+   Any other file changed on both sides (a note's text, a topic page, code, `SCHEMA.md`):
+   don't resolve anything. Comment which files conflict and that the author should run
+   `git fetch origin && git merge origin/main` (or ask Claude to resolve the PR's conflicts),
+   add `needs-human`, and move to the next PR.
+4. Build the merged tree and check it. Unpack main's tarball (at main's head SHA), write the
+   PR head's version of every file the PR changed that main didn't (delete those the PR
+   deleted), write the resolved files from step 3, then run `python3 tools/library.py build`
+   and `python3 tools/library.py check`. No Python, or any `ERROR`: stop and treat it as the
+   other-files case in step 3.
+5. Commit it as a merge on the PR branch with the Git Data API: one `POST .../git/blobs`
+   per path you wrote in step 4 (the PR's files, the resolved files, `INDEX.md`,
+   `references.bib`); `POST .../git/trees` with `base_tree` set to main's tree SHA and those
+   blobs (and `"sha": null` for deletions); `POST .../git/commits` with parents
+   `[<head_sha>, <main_sha>]` and a message listing each resolved file and how; then
+   `PATCH .../git/refs/heads/<head_ref>` with the new SHA and `"force": false`. A `422`
+   means the branch moved: re-read the PR and start again from step 1, once.
+6. Review the PR as usual at its new head, and say in your summary comment that you merged
+   `main` in and which files you resolved.
 
 **Run the checker.** Unpack the PR-head tarball and, if `command -v python3` finds Python,
 run `python3 tools/library.py check` from the repo root (standard library only), and for
@@ -225,4 +271,7 @@ the originals and their claims from `_Unprocessed`."
 - Only act on open PRs in MonashUniversity-ShockLab. Never push to a default branch, never force-push,
   never close a PR, never change repo settings.
 - If a merge fails (conflict, or the head moved), comment why, add `needs-human`, and move on.
+  The one exception is a `Library_of_Shock_Lab` PR whose conflicts are all in the shared
+  files listed under "Conflicts with `main`": bring it up to date as that section says, then
+  merge it.
 - End with a one-paragraph report: the PRs you looked at, and what you did with each.
