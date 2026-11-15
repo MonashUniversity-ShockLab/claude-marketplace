@@ -211,7 +211,7 @@ Its definition lives in [`managed-agents/pr-agent/`](managed-agents/pr-agent/):
 | `agent.md` | Model and instructions (the review, fix and merge rules) |
 | `environment.yaml` | Sandbox; its network can only reach GitHub |
 | `vault.yaml` | Holds the GitHub tokens `GH_TOKEN` and `GH_DISPATCH_TOKEN` (never committed) |
-| `deployment-hourly.yaml` | The Console schedule (hourly, 8am-8pm Melbourne, Mon-Fri), plus a $3 cap per run |
+| `deployment-hourly.yaml` | The Console schedule (hourly, 8am-8pm Melbourne, Mon-Fri), plus a $10 cap per run |
 
 `claude-lock.json` records the Console IDs. To change the agent, edit the file, then run
 `ant apply managed-agents/pr-agent/<file>` from the repo root, signed in with
