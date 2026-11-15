@@ -6,7 +6,7 @@ environment_id: ./environment.yaml
 vault_ids: [vlt_011CgrkLxBgcaaor8AgM82Q1]   # the shocklab-pr-agent vault (vault.yaml)
 budget:
   type: limit
-  max_list_cost: {amount: "300", currency: USD}   # hard cap per run: $3.00
+  max_list_cost: {amount: "1000", currency: USD}   # hard cap per run: $10.00
 schedule: {type: cron, expression: "0 8-20 * * 1-5", timezone: Australia/Melbourne}
 initial_events:
   - type: user.message
