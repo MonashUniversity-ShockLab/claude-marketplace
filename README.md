@@ -141,6 +141,44 @@ shared, in the clone's `research_questions/`: any member may add one with
 `tools/library.py` find it the same way and create what they need there; nothing in it is
 committed to the shared repo.
 
+### Keeping up to date weekly
+
+`autoUpdate` refreshes the plugins, but your library clone only changes when you pull it.
+To have Claude do both every week, paste this into a Claude desktop-app session (the task
+runs only while the app is open and the computer is awake):
+
+> Set up a **weekly scheduled task** in the Claude desktop app that keeps my ShockLab setup
+> in line with GitHub. Before creating it, ask me which day and time to run it (suggest
+> Monday morning) and show me the task's prompt to check.
+>
+> Each week the task should:
+>
+> 1. **Pull the library.** In my clone of `MonashUniversity-ShockLab/Library_of_Shock_Lab`
+>    (path in the `SHOCKLAB_KNOWLEDGE` environment variable), run `git pull --ff-only`. If
+>    the clone has uncommitted changes, is not on `main`, or can't fast-forward, don't
+>    stash, reset, rebase or merge: leave it and report it. If Market is mounted, also copy
+>    any new paper PDFs from Market `Library_of_Shock_Lab\papers` into the clone's
+>    `attachments\papers\`, with commands that never overwrite (Windows:
+>    `robocopy <src> <dst> /E /XC /XN /XO`); if it isn't mounted, skip this and say so.
+> 2. **Check the plugins match GitHub.** Read `.claude-plugin/marketplace.json` from
+>    `MonashUniversity-ShockLab/claude-marketplace` on `main` (with `gh api`) and compare
+>    each `shocklab-*` plugin's version with what Claude Code has installed locally (under
+>    `~/.claude/plugins/`). Refresh the `shocklab` marketplace and update any plugin that is
+>    behind with the `claude plugin` CLI commands if available (check `claude plugin --help`);
+>    otherwise tell me to run `/plugin marketplace update shocklab` in a new session. Check
+>    that the `shocklab` marketplace has `autoUpdate` on in my user settings, and tell me if
+>    not, but don't change my settings yourself.
+> 3. **Report briefly:** library commits pulled (count and a one-line summary of what
+>    changed, e.g. new paper notes or topic pages), PDFs copied, plugins updated (old → new
+>    version), and anything that needs me (a dirty clone, a failed update). Remind me that
+>    updated skills load only in a **new** session.
+>
+> Never commit, push, delete or change settings, either while setting this up or in the
+> weekly runs.
+
+Without the `claude` CLI on PATH, the task can only report which plugins are behind; update
+them by hand as it says.
+
 ### Using a skill without the plugin
 
 Every skill is one self-contained folder in [`skills/`](skills/) (`skills/<name>/SKILL.md`

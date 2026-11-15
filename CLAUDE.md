@@ -327,7 +327,15 @@ the plugin's `/import-knowledge` only loads in a new session). It needs step 6 d
 Market mounted for the papers part. If they'd rather wait, tell them to run
 `/import-knowledge` in a new session whenever they like. Either way, don't skip asking.
 
-### 11. Finish
+### 11. Weekly update task (optional)
+
+If they use the Claude desktop app, offer a weekly scheduled task that pulls their library
+clone, copies new PDFs from Market, and checks their `shocklab-*` plugins against the
+versions on GitHub. The prompt to use is in the README, "Keeping up to date weekly"; follow
+it as written (ask for the day and time, show the task prompt before creating it). Skip
+this step if they decline or don't use the desktop app.
+
+### 12. Finish
 
 Tell them:
 
