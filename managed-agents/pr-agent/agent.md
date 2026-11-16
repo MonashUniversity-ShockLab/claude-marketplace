@@ -81,8 +81,10 @@ For each open, non-draft PR, read its comments. You mark each review with a hidd
 `<!-- shocklab-pr-agent v4 reviewed {head_sha} -->` in your summary comment. Skip a PR whose
 latest marker matches its current head SHA: nothing has changed since you looked. The
 exception is a `Library_of_Shock_Lab` PR that now conflicts with `main` (`mergeable`
-`false`) and has no `needs-human` label: another PR merged after you reviewed it, so handle
-it again (see "Conflicts with `main`"). Handle all the others, one at a time.
+`false`): another PR merged after you reviewed it, so handle it again (see "Conflicts with
+`main`"). That includes one labelled `needs-human` if your own latest summary held it only
+for a merge conflict; remove the label once the conflict is resolved, unless the review
+itself finds a reason to hold. Handle all the others, one at a time.
 
 ## For each PR
 
@@ -147,9 +149,12 @@ to combine the two sides' lists in a conflict as below.
 
 **Conflicts with `main`.** Library PRs often run in parallel (overnight add-paper, audit and
 update-topics runs all start from the same `main`), so one that merges first leaves the next
-conflicting in shared files. When the PR's `mergeable` is `false` (`mergeable_state`
-`dirty`), bring its branch up to date before reviewing, but only for a PR whose head is in
-this repo (`head.repo.full_name` equals the base repo; you can't push to a fork):
+conflicting. Its files are Claude-written notes, pages, queues and tables, so you resolve
+these conflicts yourself, whatever files they are in. The goal: **nothing from either side
+is lost, and nothing is said twice.** Hold a PR for a person only over a direct
+contradiction (step 4). When the PR's `mergeable` is `false` (`mergeable_state` `dirty`),
+bring its branch up to date before reviewing, but only for a PR whose head is in this repo
+(`head.repo.full_name` equals the base repo; you can't push to a fork):
 
 1. Try GitHub's own merge first: `POST /repos/{owner}/{repo}/merges` with
    `{"base": "<head_ref>", "head": "main", "commit_message": "Merge main into <head_ref>"}`.
@@ -157,36 +162,73 @@ this repo (`head.repo.full_name` equals the base repo; you can't push to a fork)
    go on.
 2. Find the files changed on both sides. `GET .../compare/main...{head_sha}` gives the
    merge base (`merge_base_commit.sha`) and the PR's files; `GET .../compare/{merge_base}...main`
-   gives main's files. The files in both lists are the conflicts.
-3. Resolve them only if every one of them is in this list (these are the rules `/add-paper`
-   uses when it rebases):
-   - `INDEX.md`, `references.bib`: take main's version, and rebuild in step 4.
-   - `topics/_queue/*.md`, `paper_notes/_queue/*.md`, `data/*.csv`: main's version, then the
-     lines the PR added since the merge base (whole `## ` sections for a topic queue; rows
-     for a data table, without repeating the header) that main doesn't already have. If main
-     deleted the file (an update-topics run worked its queue into the page), the file is the
-     PR's added sections only, under the base's header lines if any. If the PR removed lines
-     from that file (it isn't purely additive), stop: this rule doesn't cover it.
-   - A note whose only conflicting change is its `cites:` or `related:` line: main's version
-     of the note, with that line set to main's list plus the PR's entries not in it.
-   Any other file changed on both sides (a note's text, a topic page, code, `SCHEMA.md`):
-   don't resolve anything. Comment which files conflict and that the author should run
-   `git fetch origin && git merge origin/main` (or ask Claude to resolve the PR's conflicts),
-   add `needs-human`, and move to the next PR.
-4. Build the merged tree and check it. Unpack main's tarball (at main's head SHA), write the
+   gives main's files. The files in both lists are the ones to merge. For each, fetch three
+   versions: at the merge base, at main's head and at the PR head.
+3. Merge each file. Work out what each side changed relative to the base, then write one
+   version holding both sides' changes:
+   - **Generated files** (`INDEX.md`, `references.bib`): take main's version; step 5
+     rebuilds them.
+   - **Change on one side only:** a passage only one side changed takes that side's
+     version. That covers corrections too: if main's audit fixed a number and the PR didn't
+     touch that number, main's fix stands. A deliberate deletion counts as a change: a topic
+     queue that main's update-topics run worked into its page (sections or whole file
+     deleted) stays deleted, and only the PR's *new* queue sections are kept.
+   - **Additions on both sides** (new lines, list entries, `## ` sections, data rows, table
+     rows, Papers lines): keep all of them. Drop a PR addition only if main already holds it
+     (the same queue heading, the same `note` key and values in a CSV, the same Papers
+     entry). Keep the file's own order: Papers lists and tables in their existing order
+     (by year where they are sorted); queue sections and data rows main's first, then the
+     PR's. A CSV keeps one header and its BOM. Keep a blank line before every `## ` heading.
+   - **The same sentence or line edited on both sides:** write one sentence that carries both
+     edits. If one side added a link to note A and the other a link to note B, the sentence
+     gets both links; if one side reworded it and the other added a reference, use the
+     rewording plus the reference.
+   - **The same point made on both sides** (two new sentences saying the same thing, each
+     with its own source): keep one sentence, with every source either side cited. Keep any
+     detail only one of them gives (a number, a condition, a page reference).
+   - **Different but compatible content** in the same place (two findings, two readings of
+     a result, different emphasis): keep both, attributed to their notes, in the order that
+     reads best. Differing interpretations, open questions and disagreements between papers
+     are normal in this library and are not contradictions: write "X finds…, whereas Y…".
+   - **Frontmatter:** list fields (`related`, `cites`, `topics`, `methods`, `phenomena`, …)
+     are the union, main's order first. A scalar changed on one side takes that change.
+     Changed on both: combine text fields (e.g. a `summary` that keeps both points within
+     its length) and take the later date for a date field (`audited`).
+   - **Code and config** (`tools/`, the structure of `SCHEMA.md`, `.obsidian/` shared
+     settings): merge the same way only when the two changes are independent (different
+     functions, different vocabulary entries, different keys). If they change the same
+     logic, treat it like a contradiction (step 4).
+
+   Every edit stays within what the two sides wrote: don't add new claims, don't drop or
+   soften either side's content, and don't touch unrelated text.
+4. **Direct contradictions are the only reason to hold.** A contradiction is when both sides
+   state the same specific fact (a value, a sign, a condition, a result, a paper's claim)
+   incompatibly, so that at most one can be right: "1 + 1 = 2" against "1 + 1 = 3"; a
+   screech frequency of St 0.32 against St 0.36 for the same case from the same paper; "the
+   mode is absolutely unstable" against "convectively unstable" for the same flow from the
+   same source. Check first that it really is one. Different cases, papers, conditions or
+   definitions are not a contradiction (keep both, attributed). Nor is one side changing the
+   base value while the other left it alone (take the change, step 3). For a real one, don't
+   commit anything to the branch. Comment with each contradiction (the file, both statements
+   word for word, each side's source and page reference), say that every other conflict
+   would resolve cleanly, add `needs-human`, and move to the next PR. Expect this rarely.
+5. Build the merged tree and check it. Unpack main's tarball (at main's head SHA), write the
    PR head's version of every file the PR changed that main didn't (delete those the PR
-   deleted), write the resolved files from step 3, then run `python3 tools/library.py build`
-   and `python3 tools/library.py check`. No Python, or any `ERROR`: stop and treat it as the
-   other-files case in step 3.
-5. Commit it as a merge on the PR branch with the Git Data API: one `POST .../git/blobs`
-   per path you wrote in step 4 (the PR's files, the resolved files, `INDEX.md`,
+   deleted), write the merged files from step 3, then run `python3 tools/library.py build`
+   and `python3 tools/library.py check`. Fix any `ERROR` your merge caused (a broken link, a
+   duplicate entry, a bad frontmatter literal) and run `check` again. No Python, or an
+   `ERROR` you can't fix: stop, comment why, and add `needs-human`.
+6. Commit it as a merge on the PR branch with the Git Data API: one `POST .../git/blobs`
+   per path you wrote in step 5 (the PR's files, the merged files, `INDEX.md`,
    `references.bib`); `POST .../git/trees` with `base_tree` set to main's tree SHA and those
    blobs (and `"sha": null` for deletions); `POST .../git/commits` with parents
-   `[<head_sha>, <main_sha>]` and a message listing each resolved file and how; then
+   `[<head_sha>, <main_sha>]` and a message listing each merged file and how; then
    `PATCH .../git/refs/heads/<head_ref>` with the new SHA and `"force": false`. A `422`
    means the branch moved: re-read the PR and start again from step 1, once.
-6. Review the PR as usual at its new head, and say in your summary comment that you merged
-   `main` in and which files you resolved.
+7. Review the PR as usual at its new head. In your summary comment, say that you merged
+   `main` in, and list each merged file with one line on what you combined (e.g.
+   "topics/retro-propulsion.md: kept both PRs' Papers lines"; "kim-2022 line 34: one
+   sentence with both links").
 
 **Run the checker.** Unpack the PR-head tarball and, if `command -v python3` finds Python,
 run `python3 tools/library.py check` from the repo root (standard library only), and for
@@ -271,7 +313,7 @@ the originals and their claims from `_Unprocessed`."
 - Only act on open PRs in MonashUniversity-ShockLab. Never push to a default branch, never force-push,
   never close a PR, never change repo settings.
 - If a merge fails (conflict, or the head moved), comment why, add `needs-human`, and move on.
-  The one exception is a `Library_of_Shock_Lab` PR whose conflicts are all in the shared
-  files listed under "Conflicts with `main`": bring it up to date as that section says, then
-  merge it.
+  The exception is a `Library_of_Shock_Lab` PR from this repo: resolve its conflicts as
+  "Conflicts with `main`" says, then review and merge it. Hold it only for a direct
+  contradiction or a check you can't make pass.
 - End with a one-paragraph report: the PRs you looked at, and what you did with each.
