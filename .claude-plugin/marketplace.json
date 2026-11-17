@@ -26,8 +26,8 @@
       "name": "shocklab-library",
       "source": "./",
       "strict": false,
-      "description": "Paper-library skills for Library_of_Shock_Lab: /lit, /research-question, /add-paper and /paper-audit (plus the paper-auditor agent) and /update-topics (revise topic pages from their queues and apply queued note updates, claiming each page and note first) for everyone; /restructure-note (plus the note-restructurer agent) for maintainers; /schedule-library-processing books an unattended overnight run of add-paper, paper-audit or update-topics for anyone; /library-status reports what is queued (topic queues, note updates, the audit queue, Market papers waiting or not yet filed, library health) for anyone",
-      "version": "0.7.3",
+      "description": "Paper-library skills for Library_of_Shock_Lab: /lit, /research-question, /add-paper and /paper-audit (plus the paper-auditor agent) and /update-topics (revise topic pages from their queues and apply queued note updates, claiming each page and note first) for everyone; /restructure-note (plus the note-restructurer agent) for maintainers; /schedule-library-processing books an unattended overnight run of add-paper, paper-audit or update-topics for anyone; /library-status pulls the clone, files indexed PDFs on Market and reports what is queued (topic queues, note updates, the audit queue, Market papers waiting or not yet filed, library health) for anyone",
+      "version": "0.7.4",
       "author": {
         "name": "MonashUniversity-ShockLab"
       },
