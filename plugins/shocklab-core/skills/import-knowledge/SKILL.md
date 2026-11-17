@@ -101,17 +101,18 @@ Where it goes (per the library's `CLAUDE.md`):
 |---|---|
 | One-line org fact | a dated line in `documentation/Org Gotchas.md`, linked to its detail |
 | Workflow, script how-to, HPC procedure | `documentation/` page (Claude-authored callout and frontmatter) |
-| Lab method | `methods/` (human-owned: `type: note`, `owner:` the member) |
-| Rig, camera, nozzle, sensor | `facilities/` (human-owned, as above) |
+| Lab method | `methods/` (human-written: `type: note`, `owner: MonashUniversity-ShockLab`, `authors:` the member) |
+| Rig, camera, nozzle, sensor | `facilities/` (human-written, as above) |
 | Summary of a group code repo | `codebase_notes/` |
 | Claim about a published paper | not written: list under "Suggested library updates" in the PR |
 
-Pages you draft from someone's notes that will be `type: note` belong to that member:
-set `owner:` to them and tell them they own it. Anything you synthesise yourself is
+Pages you draft from someone's notes that will be `type: note` belong to the group, with
+the member credited: set `owner: MonashUniversity-ShockLab` and `authors:` to them, and tell them they are
+credited as its author and should read it as their own words. Anything you synthesise yourself is
 Claude-authored and follows the provenance rules (callout, `type: generated`,
-`author: claude`, `sources:`; never fill `verified:`). An existing page someone else owns:
-don't reword it; add an `## Open questions` entry or a task, or note the addition in the
-PR for its owner. A conflict goes in as an open question on the existing page, citing both.
+`author: claude`, `sources:`; never fill `verified:`). An existing human-written page by
+someone else: extend or correct it without rewriting their text, and name its `authors:`
+in the PR so they can review it. A conflict goes in as an open question on the existing page, citing both.
 
 **Show the member a table** before writing: candidate, source file, classification,
 destination, one-line content. Let them strike or edit rows.

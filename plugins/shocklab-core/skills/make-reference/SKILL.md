@@ -60,15 +60,16 @@ Pick the folder from what the document *is*, using the library's layout:
 |---|---|---|
 | A workflow, script or HPC how-to that will be kept up to date | `documentation/` (in a thread subfolder if one fits, e.g. `documentation/LES/`) | Claude-authored |
 | A one-off explainer, derivation or code/maths breakdown, not kept current | `generated/` | Claude-authored |
-| How the lab does a technique (schlieren, PIV, calibration, ...) | `methods/` | human-owned: `type: note`, `owner:` the user |
-| A rig, nozzle, camera or sensor: specs, settings, quirks | `facilities/` | human-owned, as above |
+| How the lab does a technique (schlieren, PIV, calibration, ...) | `methods/` | human-written: `type: note`, `owner: MonashUniversity-ShockLab`, `authors:` the user |
+| A rig, nozzle, camera or sensor: specs, settings, quirks | `facilities/` | human-written, as above |
 | A summary of one of the group's code repos | `codebase_notes/` | Claude-authored |
-| Something every new member needs first | `onboarding/` | human-owned, as above |
+| Something every new member needs first | `onboarding/` | human-written, as above |
 | An app (player, viewer, exporter) other members should install | not this skill: `/publish-app` gives it an org repo, releases and its `applets/` card | |
 | One-line org facts it turned up | also a dated line each in `documentation/Org Gotchas.md`, linking to the new page | |
 
-Human-owned folders hold documents a person maintains: put one there only if the user will
-own it (`owner:` them). Otherwise use the Claude-authored folder that fits.
+Human-written folders hold documents in a person's own words, owned by the group: put one
+there only if the user will stand behind it as its author (`authors:` them). Otherwise use
+the Claude-authored folder that fits.
 
 Name it as the library's "Naming" section says (title case for `documentation/` and
 `generated/`, prefixed by thread when there is one; sentence case for `methods/`,
@@ -94,8 +95,9 @@ git -C "$SHOCKLAB_KNOWLEDGE" worktree add -b reference/<github-login>-<short-slu
   notes any literature claims came from, and `verified:`/`verified_by:` left **empty**
   (only a person fills them). Mark **derived**, **asserted** and **inferred** where it isn't
   obvious.
-- **Human-owned folders**: `type: note`, `owner:` the user, written in their voice from
-  their material; tell them they own it and should read it as their own.
+- **Human-written folders**: `type: note`, `owner: MonashUniversity-ShockLab`, `authors:` the user, written in
+  their voice from their material; tell them they are credited as its author and should
+  read it as their own.
 - **Write for the reader you agreed**: what it's for and when to use it at the top; then the
   steps, settings and decisions that matter, with the reasons; the gotchas and how to get
   out of them; where the code, data or rig lives (repo names, Market paths, M3 paths, not

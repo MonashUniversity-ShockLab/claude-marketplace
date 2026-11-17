@@ -67,8 +67,8 @@ to do it.
   with a link to where the detail lives.
 - Needs explanation → add to the existing page that covers it, or a new
   `documentation/` page, and link it from `Org Gotchas.md`.
-- Lab method or hardware → `methods/` or `facilities/`, owned by the user (human-written
-  notes; you draft, they own).
+- Lab method or hardware → `methods/` or `facilities/` (human-written notes owned by the
+  group, `owner: MonashUniversity-ShockLab`; you draft, the user is credited in `authors:`).
 - Record what was observed, when (`YYYY-MM-DD`), and on what (e.g. Slurm version,
   module), because cluster behaviour changes.
 

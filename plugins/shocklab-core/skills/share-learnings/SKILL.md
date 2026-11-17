@@ -241,9 +241,9 @@ git -C "$SHOCKLAB_KNOWLEDGE" worktree add -b learnings/<github-login>-<YYYY-MM-D
 - **Stay inside the page's Scope section.** Material that falls outside it waits for its
   own document; say so in the report.
 - **Match the page and leave its text alone.** Keep its numbering and bullet style. Add;
-  don't reword or reorder. If the page has an `owner:` who is not the member, don't edit
-  it: add an `## Open questions` entry or a task, or list the addition in the PR for the
-  owner.
+  don't reword or reorder. If the page is human-written (`type: note`) and the member
+  is not in its `authors:`, don't rewrite their text: extend or correct it, use an
+  `## Open questions` entry for a disagreement, and name its `authors:` in the PR.
 - **Provenance.** On a Claude-authored page, add a sentence to the opening callout saying
   additions were made on this date from a lab member's notes, and update its "derived vs
   asserted" section. Mark single observations as such. A conflict or an untested step

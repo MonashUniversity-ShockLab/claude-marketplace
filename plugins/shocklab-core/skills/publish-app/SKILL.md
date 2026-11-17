@@ -186,7 +186,7 @@ In a worktree of the library on `applets/<login>-<name>`:
 
 - Write `applets/<Name>.md` in the format set out in `applets/_Applets.md`, modelled on
   `applets/FieldsPlayer.md`: what it is and who it's for, Install, What it reads,
-  Command line / for agents, Changing it, Related. Frontmatter `owner:` = maintainer's
+  Command line / for agents, Changing it, Related. Frontmatter `maintainer:` = maintainer's
   login, `repo:`, `release:`.
 - Add its row to the table in `applets/_Applets.md`.
 - `python tools/library.py check`, show the diff, commit `Add applet: <Name>`, push, and
