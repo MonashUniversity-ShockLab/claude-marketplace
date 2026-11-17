@@ -25,7 +25,7 @@ The helper scripts need only standard Python 3: run them as `python <library>/to
 
 `library.py` and `restructure_check.py` mean `python <library>/tools/<script>`.
 
-**Pull first.** Pull (`git -C <library> pull --ff-only`) and commit on the current branch (normally `main`); the run ends with a push (section 3). If the maintainer prefers a pull request, create a branch now (e.g. `restructure/YYYY-MM-DD`) for every commit below. A maintainer working in their own repo for the weekly sync just commits there.
+**Pull first.** `git -C <library> switch main` and `git -C <library> pull --ff-only` (if the switch is refused because of uncommitted changes, show them and ask; an earlier run may have left the clone on its pull-request branch), and commit on the current branch (normally `main`); the run ends with a push (section 3). If the maintainer prefers a pull request, create a branch now (e.g. `restructure/YYYY-MM-DD`) for every commit below. A maintainer working in their own repo for the weekly sync skips the switch and just commits there.
 
 **Personal files.** `<personal>` is the user's personal folder for these files, outside the shared repo: the path in the environment variable `SHOCKLAB_PERSONAL` if it is set, else `My_Knowledgebase/` next to the library (`<library>/../My_Knowledgebase`) if it exists, else `<library>` itself (the old layout, where `Misc/` is git-ignored). Research questions are not personal: they are shared in `<library>/research_questions/`, each with its `author`. The library tools find it the same way (`library.personal_dir()` in `<library>/tools/library.py`). The ledger `<personal>/Misc/restructure_ledger.tsv`, the flags file `<personal>/Misc/restructure_flags.md`, and the audit ledger and `notes_to_update.md` it reads, are the user's own working files: not part of the shared repo and never committed to it. Create the ledger and flags file when missing (headers below).
 
@@ -81,7 +81,7 @@ For each note:
 
 Then `library.py check` (it must show no new ERROR or WARN for these notes), and commit the wave's notes by name, on the current branch (the ledger and flags file are personal and stay uncommitted): `git commit -m "Restructure reference notes: <n> notes (structure and length rules, no content change)" -- <paths>`. The notes' frontmatter is unchanged, so `INDEX.md` and `references.bib` need no rebuild.
 
-After the last wave, show the user `git -C <library> log --stat @{u}..HEAD` and ask before pushing; then `git -C <library> pull --rebase` and push. If the maintainer chose a branch, push it and open a PR to `MonashUniversity-ShockLab/Library_of_Shock_Lab` instead (`gh pr create`, with the report as the body). For the weekly sync, stop at the commit.
+After the last wave, show the user `git -C <library> log --stat @{u}..HEAD` and ask before pushing; then `git -C <library> pull --rebase` and push. If the maintainer chose a branch, push it and open a PR to `MonashUniversity-ShockLab/Library_of_Shock_Lab` instead (`gh pr create`, with the report as the body). Then put the clone back on `main` (`git -C <library> switch main` and `git -C <library> pull --ff-only`), so the next run, an overnight run and `/lit` start from merged work; the branch's changes leave the working tree until the pull request merges (git-ignored files such as the PDFs in `attachments/papers/` stay). For the weekly sync, stop at the commit.
 
 Context budget: as `/paper-audit` (stop starting waves once compacted or past about 200k).
 
