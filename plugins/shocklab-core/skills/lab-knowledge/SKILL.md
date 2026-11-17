@@ -63,14 +63,29 @@ needs, a Strudel quirk, a mount trick, a licence or module version that works, a
 setting — then, once the user's task is done, offer to record it. Don't interrupt the task
 to do it.
 
+It goes in as a **proposal**: offer `/propose-docs` (its default mode works from this
+conversation), which checks the library for conflicts, shows the user the points and opens
+the proposal PR; a maintainer's review (`/review-proposals`) then applies what it accepts.
+Never edit these pages directly. Its other modes cover bigger write-backs:
+`/propose-docs <file or folder>` (one reference page), `/propose-docs sweep` (the user's
+recent working documents) and `/propose-docs import` (a new member's notes and papers).
+The target is:
+
 - Short, single fact → a line in `documentation/Org Gotchas.md` under the right heading,
   with a link to where the detail lives.
-- Needs explanation → add to the existing page that covers it, or a new
-  `documentation/` page, and link it from `Org Gotchas.md`.
+- Needs explanation → the existing page that covers it, or a new `documentation/` page,
+  linked from `Org Gotchas.md`.
 - Lab method or hardware → `methods/` or `facilities/` (human-written notes owned by the
   group, `owner: MonashUniversity-ShockLab`; you draft, the user is credited in `authors:`).
+- Something that contradicts a page → a C-point quoting the existing text, not an edit.
 - Record what was observed, when (`YYYY-MM-DD`), and on what (e.g. Slurm version,
-  module), because cluster behaviour changes.
+  module), because cluster behaviour changes; that is the point's evidence (**derived** if
+  you ran it: command, job ID, output).
+
+Only a purely mechanical fix (typo, broken link or wikilink, formatting, frontmatter, with
+no command, number, path, name, version or meaning changed) may skip the proposal: a PR on
+branch `docfix/<login>-<YYYY-MM-DD>`. When a review of the user's proposal comes back,
+`/propose-docs proposal_response` takes them through it.
 
 Not worth recording: things in the public docs that worked first time, personal
 preferences, anything project-private.
@@ -114,23 +129,35 @@ How to use them:
 ## 5. Rules for any write
 
 - Follow the vault's `CLAUDE.md`: templates in `_templates/`, naming rules, frontmatter.
+- **`documentation/` (incl. Org Gotchas), `methods/`, `facilities/`, `codebase_notes/`:**
+  every addition or change, by anyone, maintainers included, goes through `/propose-docs`
+  (see `documentation/_proposals/_Proposals.md`), apart from the mechanical fast lane in
+  §3. Don't reword text there; a change to it is a C-point.
 - Anything you author is Claude-authored: `generated/` or `documentation/`, with the
   `> [!warning] Claude-authored` callout — **never** in `paper_notes/`, which only the
   library skills (`/add-paper`, `/paper-audit`, `/restructure-note`) write, following
   `SCHEMA.md`.
 - Never fill in `verified:` or `verified_by:`.
-- Don't reword notes other people own; add tasks or open questions instead.
 - Never commit PDFs, `.mat`, video or raw data.
-- Show the user the diff and ask before committing or pushing; it's a repo the whole lab
-  shares. Pull, commit small on a branch, push it and open a PR; the org has a PR agent
-  that reviews PRs against the repo's `CLAUDE.md`.
+- Elsewhere (`generated/`, `research_questions/`, ...), show the user the diff and ask
+  before committing or pushing; it's a repo the whole lab shares. Pull, commit small on a
+  branch, push it and open a PR; the org has a PR agent that reviews PRs against the
+  repo's `CLAUDE.md`.
 - **Leave merging to the PR agent.** It reviews and merges PRs hourly on weekdays, so don't
   merge into `main` yourself or suggest the user does. If they ask to, first show what the
-  merge brings in (`gh pr view <n> --json files,additions,deletions`), and offer to merge only
+  merge brings in (`gh pr view <n> --repo MonashUniversity-ShockLab/<repo> --json files,additions,deletions`;
+  `Library_of_Shock_Lab` for the library), and offer to merge only
   part (e.g. just one `.md`) by moving those files into their own PR. If they still want to
   merge, that's allowed: do it. (The plugin's merge-guard hook also asks them before any
-  `gh pr merge` on an org repo.) Maintainers' direct pushes of library changes, as the
-  library's `CLAUDE.md` allows, are unaffected.
+  `gh pr merge` on an org repo.) **The exception is a library PR that changes the group
+  pages** (`documentation/` other than the add-paper token log, `methods/`, `facilities/`,
+  `codebase_notes/`, and the proposal templates): don't merge it yourself, even if asked,
+  because the PR agent's checks are the
+  gate for those pages and it flags any PR someone else merged. Say so, and leave it to the
+  PR agent. Maintainers may still push straight to `main`, as the
+  library's `CLAUDE.md` allows, but only for proposal claims (the `status:` fields
+  `/review-proposals` sets) and library work outside the four folders above, never for
+  page content in them.
 - `Misc/` in a clone is the member's personal working space; never commit it.
   `research_questions/` is shared: any member may add one (with `/research-question`, on a
   branch with a PR); don't edit another member's question without asking them.

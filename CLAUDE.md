@@ -101,10 +101,14 @@ and it shows up alongside the plugin's (e.g. `/add-paper` next to
 the `.claude/` folder of the project they work in, for:
 
 - the same name as a plugin skill or agent: `add-paper`, `lit`, `research-question`,
-  `paper-audit`, `restructure-note`, `import-knowledge`, `lab-knowledge`, `queue`,
-  `enact-queue`, `paper-auditor`, `note-restructurer`, `figure-master` (list the plugins' current
-  ones with `gh api repos/MonashUniversity-ShockLab/claude-marketplace/contents/skills` and
+  `paper-audit`, `restructure-note`, `lab-knowledge`, `publish-app`, `propose-docs`,
+  `review-proposals`, `queue`, `enact-queue`, `paper-auditor`, `note-restructurer`,
+  `doc-reviewer`, `figure-master` (list the plugins' current ones with
+  `gh api repos/MonashUniversity-ShockLab/claude-marketplace/contents/skills` and
   `.../contents/plugins/<plugin>/skills`, in case this list is out of date);
+- skills the plugins have retired: `import-knowledge`, `make-reference` and
+  `share-learnings` (since shocklab-core 0.10.0, the `/propose-docs` modes `import`,
+  `<file or folder>` and `sweep`);
 - a different name but the same job, judged from its description (e.g. a `paper-index` or
   `literature` skill that writes notes into the library);
 - in `~/.claude/CLAUDE.md`, a block telling Claude to check the ShockLab knowledge base (the
@@ -315,17 +319,21 @@ first commit, or a second one.
 Ask: **"Where is your current knowledge stored?"** (note folders or vaults, project
 `CLAUDE.md`s and READMEs, Claude memory, HPC notes, paper folders such as `Literature/`
 or Zotero `storage/`). Explain what happens next: Claude pulls out what is useful to the
-whole lab into the library by pull request, and copies their papers that the group doesn't
+whole lab and submits it as proposals for the library's group pages (`/propose-docs`; a
+maintainer reviews each point before any page changes, and they hear back on what was
+accepted), and copies their papers that the group doesn't
 already have to Market `_Unprocessed`, renamed to the `Authors_Year_Title.pdf` convention,
 ready for anyone to index with `/add-paper` (token-heavy; it offers this at the end). Their own files are only read, never moved or changed, and
 nothing private is copied.
 
-If they want to do it now, follow `plugins/shocklab-core/skills/import-knowledge/SKILL.md`
-in this repo (read it with
-`gh api repos/MonashUniversity-ShockLab/claude-marketplace/contents/plugins/shocklab-core/skills/import-knowledge/SKILL.md -H "Accept: application/vnd.github.raw"`;
-the plugin's `/import-knowledge` only loads in a new session). It needs step 6 done, and
-Market mounted for the papers part. If they'd rather wait, tell them to run
-`/import-knowledge` in a new session whenever they like. Either way, don't skip asking.
+If they want to do it now, run `/propose-docs import` from this repo's files, because the
+plugin only loads in a new session: read both
+`plugins/shocklab-core/skills/propose-docs/SKILL.md` (setup and the shared core) and
+`plugins/shocklab-core/skills/propose-docs/modes/import.md` (the mode itself), each with
+`gh api repos/MonashUniversity-ShockLab/claude-marketplace/contents/<path> -H "Accept: application/vnd.github.raw"`,
+and follow them. It needs step 6 done, and Market mounted for the papers part. If they'd
+rather wait, tell them to run `/propose-docs import` in a new session whenever they like.
+Either way, don't skip asking.
 
 ### 11. Weekly update task (optional)
 
@@ -353,8 +361,14 @@ Tell them:
   request, after claiming the note). `/restructure-note` is for maintainers only.
 - Read `onboarding/Getting started.md` and `CLAUDE.md` in the library clone (in Obsidian,
   start at `Home.md`).
-- If they skipped step 10: `/import-knowledge` brings their existing notes and papers into
-  the library whenever they're ready.
+- To add to or correct the library's group pages (`documentation/`, `methods/`,
+  `facilities/`, `codebase_notes/`), use `/propose-docs`: it writes a proposal that a
+  maintainer reviews, and `/propose-docs proposal_response` handles the reply. Only typo,
+  link and formatting fixes go straight to a PR. Don't edit those pages directly.
+- If they skipped step 10: `/propose-docs import` brings their existing notes and papers
+  into the library whenever they're ready. Later, `/propose-docs sweep` checks their recent
+  work for what the lab could use, and `/propose-docs <file or folder>` writes one thing up
+  as a reference page.
 
 ## Working on plugins here
 

@@ -72,10 +72,16 @@ clone). Paste:
 
 | Plugin | What it gives you |
 |---|---|
-| `shocklab-core` | **Everyone should install this.** A start-of-session reminder plus the `lab-knowledge` skill: Claude checks the [knowledge base](https://github.com/MonashUniversity-ShockLab/Library_of_Shock_Lab) before working out anything org-specific (M3, Slurm, Strudel, Market, rigs) and points literature questions at `/lit`, and offers to record what it learns so the next person doesn't have to. It also knows the org's code repos (schlieren, acoustics, PIV and LES processing scripts, the schlieren tutorial), so Claude checks the standard code before writing new processing code. Also `/import-knowledge`, the onboarding step that harvests a new member's existing notes into the library (by PR) and copies their papers the group doesn't hold to Market `_Unprocessed`, named `Authors_Year_Title.pdf`; and `/make-reference`, which turns a file or folder (notes, scripts, a project) into one reference document for other members, recommends where it goes in the library, and opens a PR once you approve the location; and `/share-learnings`, the periodic sweep that reads what changed lately in your own working documents (READMEs, test reports, set-up notes, project `CLAUDE.md`, Claude's memory), compares it with the library and reports what the lab could use that isn't there yet (additions to existing pages, new documents, items to hold, library statements your notes outdate), then writes the batch you pick by PR (token-heavy: one subagent per area); and `/publish-app`, which puts an app you built (e.g. one based on FieldsPlayer) in its own org repo with downloadable releases, the way FieldsPlayer is set up, and lists it in the library's `applets/` |
+| `shocklab-core` | **Everyone should install this.** A start-of-session reminder plus the `lab-knowledge` skill: Claude checks the [knowledge base](https://github.com/MonashUniversity-ShockLab/Library_of_Shock_Lab) before working out anything org-specific (M3, Slurm, Strudel, Market, rigs) and points literature questions at `/lit`, and offers to record what it learns so the next person doesn't have to. It also knows the org's code repos (schlieren, acoustics, PIV and LES processing scripts, the schlieren tutorial), so Claude checks the standard code before writing new processing code. Also `/propose-docs`, the one way everyone (maintainers included) adds to or changes the library's group pages (`documentation/` incl. Org Gotchas, `methods/`, `facilities/`, `codebase_notes/`): it splits the change into new (N) and conflicting (C) points, each with its evidence, checks them against those pages, and opens a PR adding the proposal to `documentation/_proposals/`. Its modes find the items: `/propose-docs [what]` from the current task, `/propose-docs <file or folder>` writes one file or folder up as a reference page and recommends where it goes, `/propose-docs sweep` reads what changed lately in your own working documents (READMEs, test reports, set-up notes, project `CLAUDE.md`, Claude's memory) and reports what the lab could use (token-heavy: one subagent per area), and `/propose-docs import` is the onboarding import of a new member's notes, which also copies their papers the group doesn't hold to Market `_Unprocessed`, named `Authors_Year_Title.pdf`; `/propose-docs proposal_response` takes you through the review's reply (typo, link and formatting fixes can still go straight to a PR). And `/publish-app`, which puts an app you built (e.g. one based on FieldsPlayer) in its own org repo with downloadable releases, the way FieldsPlayer is set up, and lists it in the library's `applets/`. For maintainers only, `/review-proposals`: its `doc-reviewer` agent judges each proposal's points against their evidence and the library, writes the response and prepares a PR applying the accepted points |
 | `shocklab-library` | Skills for the shared paper library (`Library_of_Shock_Lab`, found through `SHOCKLAB_KNOWLEDGE`): for everyone, `/lit` (answer from the library, with note and page citations) and `/research-question` (in-depth reasoned answer, saved and shared in the library's `research_questions/` with you as `author`; open a PR to add it) and `/add-paper` (index new PDFs into notes, topic pages and data tables by pull request, then file them on Market; token-heavy, as it reads each paper in full) and `/paper-audit` (re-check an older note against its PDF and the library, by pull request; notes are claimed first so nobody audits the same one twice; token-heavy), plus the `paper-auditor` agent it launches, and `/update-topics` (work the queued contributions into the topic pages, major corrections and largest queues first, then apply the queued note updates; each page and note is claimed on Market first so two runs never revise the same one; a member's run does 3 pages by default and opens a PR; one commit per page, so a cut-off loses at most one page; token-heavy), and `/schedule-library-processing <skill>` (books an unattended run of `add-paper`, `paper-audit` or `update-topics` for 11pm tonight, with a 4:05am task that finishes any cut-off work and opens the pull request: a way to spend spare usage at the end of the week; needs the Claude desktop app open and the computer awake overnight), and `/library-status` (pulls the library clone and files indexed papers' PDFs on Market, after one confirmation, then gives a quick report of what is waiting: contributions queued per topic page and pages due for revision, queued note updates and notes still to check, the paper-audit queue and audits in progress, papers in Market `_Unprocessed` and who has claimed them, indexed papers whose PDF isn't filed on Market yet, a library health line from `library.py check`, and open library pull requests, each with the skill that clears it); for maintainers only, `/restructure-note` (reshape audited notes to the template) and its `note-restructurer` agent. Members' `/add-paper` and `/paper-audit` runs queue topic-page changes but never revise the pages; `/update-topics` or a maintainer's run does that. To get a paper in, put its PDF in Market `Library_of_Shock_Lab\papers\_Unprocessed\`; anyone can then process it with `/add-paper`. See [Setting up the paper library](#setting-up-the-paper-library) |
 | `shocklab-apps` | `/queue` (add a request to an app's `FEATURE_QUEUE.md` for the next build) and `/enact-queue` (build every queued request with one version bump, using the build and test steps in the app's README). Works for any app folder in your repo that has, or gets, a `FEATURE_QUEUE.md` |
 | `shocklab-figures` | The `figure-master` agent: makes plots from data in the lab's MATLAB house style (Times 16 pt, LaTeX labels, `pogmap`/`CMRmap`, no titles), restyles existing ones, copies journal figures only after checking their licence and recreates them from data otherwise, then hands back a LaTeX figure block. Ships the `pogmap` and `CMRmap` colormaps. See [Setting up figure-master](#setting-up-figure-master) |
+
+### What changed
+
+- **shocklab-core 0.10.0:** `/import-knowledge`, `/share-learnings` and `/make-reference` are gone; they are now modes of
+  `/propose-docs`: `/propose-docs import`, `/propose-docs sweep` and `/propose-docs <file or folder>`. Group pages change
+  only by proposal, reviewed with `/review-proposals`. Earlier `share_learnings.tsv` ledgers still work with the sweep.
 
 ### How `shocklab-core` avoids duplicated work
 
@@ -84,9 +90,12 @@ clone). Paste:
    for the `lab-knowledge` skill before working out org-specific procedures, not only when
    the question happens to match the skill's description. The skill starts with
    `documentation/Org Gotchas.md` in the knowledge repo, then greps.
-2. **Write back.** When Claude solves something non-obvious and org-specific, it offers,
-   after your task, to add it to the knowledge base. You see the diff before anything
-   is committed.
+2. **Write back, through review.** When Claude solves something non-obvious and
+   org-specific, it offers, after your task, to add it to the knowledge base as a proposal
+   (`/propose-docs`). You approve the points first, and a maintainer's review
+   (`/review-proposals`) checks each one against its evidence and the rest of the library
+   before any page changes, so a working method isn't replaced unchecked. The process is in
+   the library's `documentation/_proposals/_Proposals.md`.
 
 3. **Let the PR agent merge.** A `PreToolUse` hook (`plugins/shocklab-core/hooks/merge-guard.sh`)
    catches `gh pr merge` on a MonashUniversity-ShockLab repo and asks you first, showing the
@@ -109,7 +118,8 @@ Before working out anything specific to the lab, Monash or its infrastructure (M
 Slurm requests, Strudel, the Market drive, MATLAB on the cluster, lab rigs, cameras),
 check the ShockLab knowledge base first: start at `documentation/Org Gotchas.md` in
 MonashUniversity-ShockLab/Library_of_Shock_Lab (local clone, or `gh api`; for literature questions start at `INDEX.md` and `topics/`). After solving something
-non-obvious and org-specific, offer to record it there once my task is done.
+non-obvious and org-specific, offer to record it there once my task is done, as a proposal
+in `documentation/_proposals/` (see `_Proposals.md` there), not a direct edit.
 ```
 
 ### Setting up the paper library
@@ -231,16 +241,19 @@ across the whole org. Every hour, 8am to 8pm Melbourne time, Monday to Friday, i
 
 In the library it also runs `tools/library.py check` (0 errors is the bar), never edits
 `INDEX.md` or `references.bib` (it asks for a rebuild instead), and removes PDFs, `Misc/`
-and the skills' scratch folders from PR branches. It treats an `/add-paper` PR (many one-line
-link edits across existing notes) and a topic-page revision that drains its queue as normal
-merges. It holds a topic page rewritten without draining its queue, and audit or restructure
-work from someone who isn't a maintainer. After merging new paper notes, it reminds the
-author to file the PDFs on Market.
+and the skills' scratch folders from PR branches. For the group pages (`documentation/`,
+`methods/`, `facilities/`, `codebase_notes/`) it merges proposal PRs, review PRs that carry
+their response and mechanical fast-lane fixes, and holds any other content change to them
+(`needs-proposal`). It treats an `/add-paper` PR (many one-line link edits across existing
+notes) and a topic-page revision that drains its queue as normal merges. It holds a topic
+page rewritten without draining its queue, and audit or restructure work from someone who
+isn't a maintainer. After merging new paper notes, it reminds the author to file the PDFs
+on Market.
 
 New repos are covered automatically (the app is installed on all of the org's
 repositories). Nothing needs adding per repo. Its GitHub App has no Workflows permission,
 so it can't change or merge `.github/workflows/`; those PRs get `needs-human`. Pushes
-straight to `main` skip it.
+straight to `main` skip it, though it flags any that change the library's group pages.
 
 Its definition lives in [`managed-agents/pr-agent/`](managed-agents/pr-agent/):
 
