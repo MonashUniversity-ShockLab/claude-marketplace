@@ -79,6 +79,13 @@ clone). Paste:
 
 ### What changed
 
+- **shocklab-core 0.11.0:** `/review-proposals` keeps a source cache for each run (beside the review worktree), so a
+  source that several proposals cite is fetched once; the `doc-reviewer` agents read it before fetching and append
+  verbatim excerpts, never verdicts. The agents also batch independent reads and fetches into one call, since each
+  call re-reads the whole context. The skill now gives a measured cost per proposal (150k to 180k tokens).
+  `/propose-docs` now asks for the source text itself: the supporting lines quoted verbatim for web pages (exact
+  URL and date), code (`repo/path@commit`) and paper notes, and for derived points from the member's own notes, which
+  the reviewer can't open.
 - **shocklab-core 0.10.0:** `/import-knowledge`, `/share-learnings` and `/make-reference` are gone; they are now modes of
   `/propose-docs`: `/propose-docs import`, `/propose-docs sweep` and `/propose-docs <file or folder>`. Group pages change
   only by proposal, reviewed with `/review-proposals`. Earlier `share_learnings.tsv` ledgers still work with the sweep.

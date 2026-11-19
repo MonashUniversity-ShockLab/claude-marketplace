@@ -180,6 +180,26 @@ mechanical part by the fast lane and the rest as a proposal.
     paper note;
   - **inferred:** the member's own reading, not checked.
 
+  **Bring the source text itself, not only a pointer to it.** The reviewer checks every
+  point against its source, and a source it has to find or can't open costs a review time
+  and tokens and weakens the point. For each point:
+  - **asserted, from the web:** the URL (the page itself, not a search or index page), the
+    date read, the heading on that page, and the sentence or lines that support the point
+    quoted **verbatim**, with the version the page covers if it names one. Fetch the page
+    yourself to get the quote; don't paraphrase it, and if the page doesn't say what the
+    point says, tell the user before going on.
+  - **asserted, from code or a repo file:** `owner/repo/path@commit` and the lines quoted. A
+    commit, not a branch name, so the reviewer reads the same text.
+  - **asserted, from a colleague:** their name, the date, and what they said as closely as
+    the member can give it. Say that it is second-hand: the reviewer needs a primary source
+    as well for a point that changes a method.
+  - **asserted, from a paper note:** the note and the page cited, with the line quoted.
+  - **derived, from the member's own notes, logs or job output:** the reviewer can't open
+    the member's files, so quote the lines the point rests on verbatim (the command, the
+    output, the numbers, the date and job ID) and name the source by file name only, with
+    "not in the library or the org's repos" so the reviewer doesn't go looking. If the
+    source is in an org repo, give `owner/repo/path@commit` instead.
+
   When the specifics are missing, ask "how do you know?" and record the answer. Check what
   you can yourself: fetch the official docs and note the URL and today's date, quote the
   output from the conversation or the file the user named, read the code at a named commit.
@@ -457,7 +477,7 @@ instead of editing the four folders or opening their own PR for those items.
 | Proposed text | exactly as it would appear on the page |
 | N or C | the mode's best guess |
 | Existing text | C only: quoted exactly, with page and heading |
-| Evidence | derived / asserted / inferred, with the specifics |
+| Evidence | derived / asserted / inferred, with the specifics and the source lines quoted verbatim (see "Bring the source text itself" in 1.4) |
 | Source | the file it came from, by file name only (no personal paths) |
 | Images | any figures the proposed text embeds: the local file and its name for `attachments/images/` (they go in the proposal PR, 1.7) |
 

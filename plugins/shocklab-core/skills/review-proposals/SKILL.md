@@ -133,11 +133,14 @@ stop here.
 
 1. **Pick.** Ask which to review (AskUserQuestion): "All <n> ready, oldest first" (the
    default) or "Only some (I'll name them)", plus any stale ones the user may take over.
-2. **Cost.** There is no measured figure yet. Each agent reads the proposal and its earlier
-   rounds, every target page in full and the related pages, and fetches the official docs a
-   point cites, at high effort. Before a batch of more than 3 proposals or about 30 points
-   in all, say that the cost per proposal is unknown and offer fewer. The report at the end
-   gives each agent's usage, so a figure can be added here later.
+2. **Cost.** Each agent reads the proposal and its earlier rounds, every target page in full
+   and the related pages, and fetches the official docs a point cites, at high effort.
+   Measured on 2026-11-18 (five round-1 proposals of 7 to 15 points): 150k to 180k tokens
+   and 10 to 13 minutes per proposal, run one after another. About half of that is the
+   agent re-reading its own growing context on each of its ~50 calls, so the cost tracks
+   the number of calls more than the length of the proposal. Before a batch of more than 3
+   proposals or about 30 points in all, give that figure and offer fewer. The report at the
+   end gives each agent's usage, so the figure can be updated.
 3. **Claim** before any review starts, on `main` in the clone. For each picked proposal set
    exactly three frontmatter lines: `status: under-review`, `reviewer: <login>`,
    `review_started: <today>`. Stage those files by name, commit
@@ -166,6 +169,13 @@ stop here.
   `<wt>` is its absolute path. A cut-off run reuses its branch and worktree, and its
   `<run_base>` is `git -C <wt> merge-base HEAD origin/main`.
 - Every edit of the run goes in `<wt>`. The clone stays on `main`.
+- **Source cache:** `<cache>` = `<parent>/lib-review-<login>-sources.md`, outside the
+  worktree so it is never staged and never blocks `worktree remove`. If it doesn't exist,
+  create it with the line `# Sources read in review run <branch>`; a cut-off run keeps and
+  reuses it. The agents append to it every source they read (verbatim excerpts, URL or repo
+  path at a commit, date read) and look in it before fetching, so a source that several
+  proposals cite is fetched once per run. It holds sources only, never verdicts or
+  judgements, so each agent still forms its own view.
 
 ## 6. One proposal at a time, oldest first
 
@@ -198,6 +208,7 @@ the earlier ones in this run left them.
    - Review base, for the response's base_commit: <run_base>
    - Reviewer: <login>. Date: <today>. self_reviewed: <true|false>
    - Changed earlier in this run on the same pages: <commit and one line per point> | nothing
+   - Source cache (look in it before fetching; append what you read): <cache>
    - [Resume: your draft response, with its progress marker, is in the worktree. Carry on from it.]
    Follow your agent definition and reply with the summary it specifies.
    ```
@@ -292,15 +303,20 @@ claimed, and the next run continues the branch.
    Leave merging to the org's PR agent (don't run `gh pr merge`). Don't leave a finished
    review unsubmitted for long: proposers can open their next round only once this PR has
    merged, since both change the round's status.
-4. `git -C <library> worktree remove <wt>`, then make sure the clone is on `main` and up to
-   date (`git -C <library> switch main`, `git -C <library> pull --ff-only`). The branch stays
-   on origin until the PR merges; the claims on `main` give way to the PR's statuses then.
+4. `git -C <library> worktree remove <wt>` and delete `<cache>`, then make sure the clone is
+   on `main` and up to date (`git -C <library> switch main`, `git -C <library> pull --ff-only`).
+   On Windows the removal fails with "Permission denied" while this session's working
+   directory is inside `<wt>`: change directory out of it first, or, if the worktree is
+   already unregistered (`git worktree list`), tell the user the empty folder can be deleted.
+   The branch stays on origin until the PR merges; the claims on `main` give way to the PR's
+   statuses then.
 
 ## If the run stops early
 
 - **Claims stay** on `main`, so nobody else takes those proposals. The next run finds the
   branch without a PR and continues it (step 2): committed proposals are done, a draft
   response with the marker resumes its agent, the remaining own claims are reviewed first.
+  The source cache stays beside the worktree and is reused.
 - **Dropping a claimed proposal** (the user won't finish it): release it on `main`: set
   `status: open` and empty `reviewer:` and `review_started:`, commit
   `Release doc proposal claim: <thread>`, push. The same for the claims of a review PR that
