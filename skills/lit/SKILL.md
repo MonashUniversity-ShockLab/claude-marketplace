@@ -40,6 +40,7 @@ If no topic page fits, say so and fall back to `find` plus Grep over `<library>/
 - Notes indexed before the audits began are thinner and may hold errors until `/paper-audit` reaches them. An audited note has an `audited: "YYYY-MM-DD"` frontmatter field; `library.py find --unaudited` lists the rest. Say so when an answer rests on an un-audited note.
 - If answering needs more than about six notes in depth, give the question and the list of note paths to a `general-purpose` subagent and ask it for a cited synthesis (claims with note key + page, agreements, contradictions), so the full notes don't fill this session.
 - Open a PDF (path from the note's `pdf` field, under `<library>/attachments/papers/`; see SCHEMA for how keys map to files) only for exact wording, a figure, or a derivation the note doesn't have, using the page numbers in the note. PDFs are not in git; if one is missing, work from the note and tell the user it isn't in their copy of the Market `papers` folder.
+- **Large documents** (manuals, handbooks, books) have a hub note plus part notes (`part_of` in their frontmatter) for only some chapters. Check the hub's Coverage table: for a chapter with no part note, find the pages with `library.py search <hub key> "<regex>"` (prints PDF pages and matching lines) and read just those pages from the hub's PDF, citing them as `p. N (PDF)`. If a chapter keeps coming up, suggest `/add-large-document <hub key> --chapter <N>`.
 
 ## 3. Answer
 
